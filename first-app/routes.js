@@ -1,9 +1,8 @@
 const fs = require('fs');
 
-const requestHandler = (response, request) => {
+const requestHandler = (request, response) => {
 	const url = request.url;
 	const method = request.method;
-
 	if (url === '/') {
 		// console.log('here');
 		response.setHeader('Content-Type', 'text/html');
@@ -29,7 +28,8 @@ const requestHandler = (response, request) => {
 		const body = [];
 		request.on('data', (chunk) => {
 			body.push(chunk);
-		}).on('end', () => {
+		});
+		return request.on('end', () => {
 			const parsedBody = Buffer.concat(body).toString();
 			const message = parsedBody.split('=')[1];
 			fs.writeFile('message.txt', message, (err) => {
@@ -38,25 +38,25 @@ const requestHandler = (response, request) => {
 				return response.end();
 			});
 		});
-		response.setHeader('Content-Type', 'text/html');
-		response.write(`
-<html lang="en">
+	};
+	// 	response.setHeader('Content-Type', 'text/html');
+	// 	response.write(`
+	// <html lang="en">
 
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
+	// <head>
+	// <meta charset="UTF-8">
+	// <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	// <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	// <title>Document</title>
+	// </head>
 
-<body>
-	<h1>Hello world</h1>
-</body>
+	// <body>
+	// <h1>Hello world</h1>
+	// </body>
 
-</html>
-		`);
-		return response.end();
-	}
-}
+	// </html>
+	// 	`);
+	// 	response.end();
+};
 
 module.exports = requestHandler;
