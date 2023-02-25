@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const adminData = require('./routes/admin.js');
+const adminRoutes = require('./routes/admin.js');
 const shopRoutes = require('./routes/shop.js');
 
 // set up a server with express
@@ -24,7 +24,7 @@ app.set('views', 'views'); // its default by the way
 app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/admin', adminData.routes);
+app.use('/admin', adminRoutes.routes);
 app.use(shopRoutes);
 
 app.use((req, res, next) => {
