@@ -11,8 +11,11 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-	//const product = new Product(...Object.values(req.body));  // I even don't know what's better
-	const product = new Product(req.body.title, req.body.price, req.body.description);
+	// const product = new Product(...Object.values(req.body));  // I even don't know what's better
+	const product = new Product(req.body.title,
+		req.body.price,
+		req.body.description,
+		req.body.imageUrl);
 	product.save();
 	res.redirect('/admin/add-product');
 };
