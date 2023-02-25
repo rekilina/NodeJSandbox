@@ -1,4 +1,4 @@
-const products = [];
+const Product = require('../models/product');
 
 exports.getAddProduct = (req, res, next) => {
 	res.render('add-product',
@@ -6,21 +6,16 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postNewProduct = (req, res, next) => {
-	products.push({
-		title: req.body.title,
-		price: req.body.price
-	});
-	console.log(req.body);
+	const product = new Product(req.body.title, req.body.price);
+	product.save();
 	res.redirect('/');
 }
 
 exports.getProducts = (req, res, next) => {
-	// 2nd arg is object with data that we pass to pug
+	const products = Product.fetchAll();
 	res.render('shop', {
 		products: products,
 		docTytle: 'MyShop',
 		path: '/'
 	});
 };
-
-exports.products = products;
