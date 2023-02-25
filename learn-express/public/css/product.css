@@ -1,0 +1,49 @@
+.product-form {
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+}
+
+.product-item {
+    /* width: 20rem;
+    max-width: 95%; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product__title {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+.product__price {
+    color: #4d4d4d;
+    margin-bottom: 0.5rem;
+}
+
+.product__description {
+
+}
+
+button {
+    font-size: 14px;
+	padding: 10px;
+	cursor: pointer;
+	background-color: aliceblue;
+	border-radius: 5px;
+	color: black;
+	border: 1px solid #333;
+	min-width: 50%;
+    margin: 0 auto;
+}
+button:hover {
+	background-color: teal;
+	color: aliceblue;
+	border: 1px solid teal;
+}
+
+.card {
+    box-shadow: 0px 0px 7px #333;
+    padding: 15px 0 20px;
+}
