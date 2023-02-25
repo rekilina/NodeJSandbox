@@ -1,10 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-const bodyParser = require('body-parser');
-
 const rootDir = path.dirname(require.main.filename);
+const p = path.join(rootDir, 'data', 'products.json');
 
-// const products = [];
+const getProductsFromFile = (cb) => {
+	fs.readFile(p, (err, fileContent) => {
+		if (err) {
+			return cb([]);
+		}
+		cb(JSON.parse(fileContent));
+	});
+}
 
 module.exports = class Product {
 	constructor(title, price) {
@@ -13,15 +19,9 @@ module.exports = class Product {
 	}
 
 	save() {
-		// this refers to the object created in this class
-		const p = path.join(rootDir, 'data', 'products.json');
-		let products = [];
-		fs.readFileSync(p, (err, fileContent) => {
-			if (!err) {
-				products = JSON.parse(fileContent);
-			}
+		getProductsFromFile((products) => {
 			products.push(this);
-			fs.writeFileSync(p, JSON.stringify(products), (err) => {
+			fs.writeFile(p, JSON.stringify(products), (err) => {
 				console.log('error? ', err);
 			});
 		});
@@ -30,12 +30,6 @@ module.exports = class Product {
 	// this method should be could directly on the class itself, 
 	// and not on an instantiated object
 	static fetchAll(cb) {
-		const p = path.join(rootDir, 'data', 'products.json');
-		fs.readFile(p, (err, fileContent) => {
-			if (err) {
-				cb([]);
-			}
-			cb(JSON.parse(fileContent));
-		});
+		getProductsFromFile(cb);
 	}
 }
