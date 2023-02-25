@@ -1,21 +1,11 @@
-doctype html
-head
-  meta(charset='UTF-8')
-  meta(http-equiv='X-UA-Compatible' content='IE=edge')
-  meta(name='viewport' content='width=device-width, initial-scale=1.0')
-  title Document
+extends layouts/main-layout.pug
+block styles   
   link(rel='stylesheet' href='../css/main.css')
-header.main-header
-  nav.main-header__nav
-    ul.main-header__list
-      li.main-header__list-li
-        a.main-header__list-a(href='/') Shop
-      li.main-header__list-li
-        a.main-header__list-a(href='/admin/add-product') Add Product
-main.add-product__main
-  form.add-product__form(action='/admin/product' method='post')
-    label.add-product__form-label(for='title') Title
-    input#title.add-product__form-input(type='text' name='title' value="New Product")
-    label.add-product__form-label(for='title') Price
-    input#title.add-product__form-input(type='number' name='price' min="1" step=".1" value="10.0")
-    button.add-product__form-btn(type='submit') Submit
+block content 
+  main.add-product__main
+    form.add-product__form(action='/admin/product' method='post')
+      label.add-product__form-label(for='title') Title
+      input#title.add-product__form-input(type='text' name='title' value="New Product")
+      label.add-product__form-label(for='title') Price
+      input#title.add-product__form-input(type='number' name='price' min="1" step=".1" value="10.0")
+      button.add-product__form-btn(type='submit') Submit

@@ -11,7 +11,11 @@ const adminData = require('./admin');
 router.get('/', (req, res, next) => {
 	console.log(adminData.products);
 	// 2nd arg is object with data that we pass to pug
-	res.render('shop', { products: adminData.products, docTytle: 'MyShop' });
+	res.render('shop', {
+		products: adminData.products,
+		docTytle: 'MyShop',
+		path: '/'
+	});
 });
 
 module.exports = router;

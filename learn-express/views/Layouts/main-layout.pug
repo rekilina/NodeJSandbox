@@ -5,11 +5,14 @@ head
   meta(name='viewport' content='width=device-width, initial-scale=1.0')
   title #{docTytle}
   link(rel='stylesheet' href='css/main.css')
-
+  block styles
 header.main-header
   nav.main-header__nav
     ul.main-header__list
       li.main-header__list-li
-        a.main-header__list-a(href='/') Shop
+        a.main-header__list-a(href='/', 
+        class=(path === '/' ? 'active' : '')) Shop
       li.main-header__list-li
-        a.main-header__list-a(href='/admin/add-product') Add Product
+        a.main-header__list-a(href='/admin/add-product', 
+        class=(path === '/admin/add-product' ? 'active' : '')) Add Product
+block content

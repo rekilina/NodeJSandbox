@@ -104,6 +104,10 @@ body {
 	font-weight: 600;
 }
 
+.active {
+	color: teal
+}
+
 /* ----------------------------------------- */
 .grid {
 	display: grid;
