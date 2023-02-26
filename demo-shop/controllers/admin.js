@@ -20,6 +20,31 @@ exports.postAddProduct = (req, res, next) => {
 	res.redirect('/admin/add-product');
 };
 
+exports.getEditProduct = (req, res, next) => {
+	const prodId = req.params.prodId;
+	// const editMode = req.query.edit;
+	Product.findById(prodId, (product) => {
+		res.render('admin/edit-product', {
+			product: product,
+			pageTitle: "Edit Product",
+			path: '/admin/edit-product'
+		});
+	});
+};
+
+exports.postEditProduct = (req, res, next) => {
+	// find existing product and replace
+	const product = new Product(
+		req.body.title,
+		req.body.price,
+		req.body.description,
+		req.body.imageUrl,
+		req.body.prodId
+	);
+	product.save();
+	res.redirect("/admin/products");
+}
+
 exports.getProducts = (req, res, next) => {
 	Product.fetchAll(products => {
 		res.render('admin/products', {
