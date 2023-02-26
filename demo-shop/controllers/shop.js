@@ -16,21 +16,30 @@ exports.getProducts = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   Cart.fetchAll(cart => {
+    console.log(cart);
     Product.fetchAll(products => {
-      const prodCartId = cart.products.map(prod => prod.prodId);
-      const productsInCart = products.filter(prod => prodCartId.includes(prod.prodId));
-      const productsRender = productsInCart.map(prod => {
-        const qty = cart.products.find(pr => pr.prodId == prod.prodId).quantity;
-        return { ...prod, quantity: qty };
-      });
+      let productsRender, totalPrice;
+      if (cart.products) {
+        const prodCartId = cart.products.map(prod => prod.prodId);
+        const productsInCart = products.filter(prod => prodCartId.includes(prod.prodId));
+        productsRender = productsInCart.map(prod => {
+          const qty = cart.products.find(pr => pr.prodId == prod.prodId).quantity;
+          return { ...prod, quantity: qty };
+        });
+        totalPrice = cart.totalPrice;
+      } else {
+        productsRender = [];
+        totalPrice = 0;
+      }
+
       res.render('shop/cart', {
         prods: productsRender,
         pageTitle: 'Cart',
         path: '/cart',
-        hasProducts: products.length > 0,
+        hasProducts: productsRender.length > 0,
         activeShop: true,
         productCSS: true,
-        totalPrice: cart.totalPrice
+        totalPrice: totalPrice
       });
     });
   });

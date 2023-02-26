@@ -10,9 +10,14 @@ const p = path.join(
 const getCartFromFile = cb => {
 	fs.readFile(p, (err, fileContent) => {
 		if (err) {
-			cb({});
+			cb({ products: [], totalPrice: 0 });
 		} else {
-			cb(JSON.parse(fileContent));
+			try {
+				const cartStored = JSON.parse(fileContent);
+				cb(cartStored);
+			} catch (e) {
+				cb({ products: [], totalPrice: 0 });
+			}
 		}
 	});
 };
@@ -20,11 +25,7 @@ const getCartFromFile = cb => {
 module.exports = class Cart {
 	static addProduct(id, price) {
 		// Fetch the previous cart
-		fs.readFile(p, (err, fileContent) => {
-			let cart = { products: [], totalPrice: 0 };
-			if (!err) {
-				cart = JSON.parse(fileContent);
-			}
+		getCartFromFile(cart => {
 			// Analyze the cart = > Find existing products
 			const existingProductIndex = cart.products.findIndex(prod => prod.prodId == id)
 			// Add new product / increase quantity
