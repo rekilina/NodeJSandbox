@@ -15,7 +15,6 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProductDetail = (req, res, next) => {
   const prodId = req.params.prodId;
-  console.log(req.params.prodId);
   Product.findById(prodId, (product) => {
     res.render('shop/product-detail', {
       product: product,
@@ -41,6 +40,12 @@ exports.getCart = (req, res, next) => {
     path: '/cart'
   });
 };
+
+exports.postCart = (req, res, next) => {
+  const prodId = req.body.prodId;
+  console.log(prodId);
+  res.redirect('/products');
+}
 
 exports.getCheckout = (req, res, next) => {
   res.render('shop/sheckout', {
