@@ -34,7 +34,7 @@ module.exports = class Product {
         const existingProductIndex = products.findIndex(p => p.prodId == this.prodId);
         updatedProducts[existingProductIndex] = this;
       } else {
-        this.prodId = Math.random();
+        this.prodId = new String(Math.random());
         updatedProducts.push(this);
       }
       fs.writeFile(p, JSON.stringify(updatedProducts), err => {

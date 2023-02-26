@@ -7,6 +7,16 @@ const p = path.join(
 	'cart.json'
 );
 
+const getCartFromFile = cb => {
+	fs.readFile(p, (err, fileContent) => {
+		if (err) {
+			cb({});
+		} else {
+			cb(JSON.parse(fileContent));
+		}
+	});
+};
+
 module.exports = class Cart {
 	static addProduct(id, price) {
 		// Fetch the previous cart
@@ -32,6 +42,34 @@ module.exports = class Cart {
 			cart.totalPrice = Number(cart.totalPrice) + Number(price);
 			// update cart, save cart to the file
 			fs.writeFile(p, JSON.stringify(cart), err => {
+				console.log(err);
+			});
+		});
+	}
+
+	static fetchAll(cb) {
+		getCartFromFile(cb);
+	}
+
+	static deleteProoduct(id, prodPrice) {
+		getCartFromFile(cart => {
+			const existingProsuctIndex = cart.products.findIndex(prod => prod.prodId == id);
+			let existingProduct = cart.products[existingProsuctIndex];
+			let updatedCart, updatedCartProducts, updatedTotalPrice;
+			if (existingProduct.quantity === 1) {
+				updatedCartProducts = cart.products.filter(prod => prod.prodId == id);
+			} else {
+				existingProduct.quantity = existingProduct.quantity - 1;
+				updatedCartProducts = [...cart.products];
+				updatedCartProducts[existingProsuctIndex] = existingProduct;
+			}
+			console.log(prodPrice);
+			updatedTotalPrice = cart.totalPrice - prodPrice;
+			updatedCart = {
+				products: updatedCartProducts,
+				totalPrice: updatedTotalPrice
+			};
+			fs.writeFile(p, JSON.stringify(updatedCart), err => {
 				console.log(err);
 			});
 		});
