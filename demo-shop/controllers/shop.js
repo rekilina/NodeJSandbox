@@ -16,7 +16,6 @@ exports.getProducts = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   Cart.fetchAll(cart => {
-    console.log(cart);
     Product.fetchAll(products => {
       let productsRender, totalPrice;
       if (cart.products) {

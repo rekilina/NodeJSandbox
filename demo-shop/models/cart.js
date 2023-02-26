@@ -58,13 +58,12 @@ module.exports = class Cart {
 			let existingProduct = cart.products[existingProsuctIndex];
 			let updatedCart, updatedCartProducts, updatedTotalPrice;
 			if (existingProduct.quantity === 1) {
-				updatedCartProducts = cart.products.filter(prod => prod.prodId == id);
+				updatedCartProducts = cart.products.filter(prod => prod.prodId !== id);
 			} else {
 				existingProduct.quantity = existingProduct.quantity - 1;
 				updatedCartProducts = [...cart.products];
 				updatedCartProducts[existingProsuctIndex] = existingProduct;
 			}
-			console.log(prodPrice);
 			updatedTotalPrice = cart.totalPrice - prodPrice;
 			updatedCart = {
 				products: updatedCartProducts,
