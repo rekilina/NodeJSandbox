@@ -16,20 +16,29 @@ exports.postAddProduct = (req, res, next) => {
 		req.body.price,
 		req.body.description,
 		req.body.imageUrl);
-	product.save();
-	res.redirect('/admin/add-product');
+	product.save()
+		.then(() => {
+			res.redirect('/admin/add-product');
+		})
+		.catch(err => {
+			console.log('admin cintrollers, postAddProduct err: ', err);
+		});
 };
 
 exports.getEditProduct = (req, res, next) => {
 	const prodId = req.params.prodId;
 	// const editMode = req.query.edit;
-	Product.findById(prodId, (product) => {
-		res.render('admin/edit-product', {
-			product: product,
-			pageTitle: "Edit Product",
-			path: '/admin/edit-product'
+	Product.findById(prodId)
+		.then(([product, fieldData]) => {
+			res.render('admin/edit-product', {
+				product: product[0],
+				pageTitle: "Edit Product",
+				path: '/admin/edit-product'
+			});
+		})
+		.catch(err => {
+			console.log('admin Routes getEditProduct err: ', err);
 		});
-	});
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -41,8 +50,14 @@ exports.postEditProduct = (req, res, next) => {
 		req.body.imageUrl,
 		req.body.prodId
 	);
-	product.save();
-	res.redirect("/admin/products");
+	product.save()
+		.then(() => {
+			res.redirect('/admin/products');
+		})
+		.catch(err => {
+			console.log('admin cintrollers, postAddProduct err: ', err);
+		});;
+
 }
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -52,11 +67,13 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-	Product.fetchAll(products => {
-		res.render('admin/products', {
-			prods: products,
-			pageTitle: 'AdminProducts',
-			path: '/admin/products'
-		});
-	})
+	Product.fetchAll()
+		.then(([products, fieldData]) => {
+			res.render('admin/products', {
+				prods: products,
+				pageTitle: 'AdminProducts',
+				path: '/admin/products'
+			});
+		})
+		.catch()
 };
