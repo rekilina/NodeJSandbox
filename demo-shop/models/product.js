@@ -1,65 +1,34 @@
-const fs = require('fs');
-const path = require('path');
+const Sequelize = require('sequelize');
 
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'products.json'
-);
+// connection pool + environment
+const sequelize = require('../util/database');
 
-const getProductsFromFile = cb => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(fileContent));
-    }
-  });
-};
-
-module.exports = class Product {
-  constructor(title, price, description, imageUrl, prodId) {
-    this.title = title;
-    this.price = price;
-    this.description = description;
-    this.imageUrl = imageUrl;
-    this.prodId = prodId;
+const Product = sequelize.define('products', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    default: "New Product Item"
+  },
+  price: {
+    type: Sequelize.FLOAT,
+    allowNull: false
+  },
+  description: {
+    type: Sequelize.TEXT,
+    allowNull: true,
+    default: "default product description"
+  },
+  imageUrl: {
+    type: Sequelize.TEXT,
+    allowNull: true,
+    default: "https://img.freepik.com/free-vector/hand-drawn-flat-design-stack-books-illustration_23-2149330605.jpg?w=2000"
   }
+});
 
-  save() {
-    getProductsFromFile(products => {
-      let updatedProducts = [...products];
-      if (this.prodId) {
-        console.log('here in class');
-        const existingProductIndex = products.findIndex(p => p.prodId == this.prodId);
-        updatedProducts[existingProductIndex] = this;
-      } else {
-        this.prodId = new String(Math.random());
-        updatedProducts.push(this);
-      }
-      fs.writeFile(p, JSON.stringify(updatedProducts), err => {
-        console.log(err);
-      });
-    });
-  }
-
-  static delete(id) {
-    getProductsFromFile(products => {
-      const updatedProducts = products.filter(prod => prod.prodId != id);
-      fs.writeFile(p, JSON.stringify(updatedProducts), err => {
-        console.log(err);
-      });
-    })
-  }
-
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
-  }
-
-  static findById(id, cb) {
-    getProductsFromFile(products => {
-      const product = products.find(p => p.prodId == id);
-      cb(product);
-    });
-  }
-};
+module.exports = Product;
