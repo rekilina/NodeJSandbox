@@ -24,7 +24,7 @@ app.use(errorController.get404);
 
 sequelize.sync()
 	.then(result => {
-		console.log('Sequelize sync() result: ', result)
+		console.log('Sequelize sync() runs ');
 	})
 	.catch(err => {
 		console.log('Couldnt sequelize.sync() err: ', err);

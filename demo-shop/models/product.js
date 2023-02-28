@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../util/database');
 
 const Product = sequelize.define('products', {
-  id: {
+  prodId: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
