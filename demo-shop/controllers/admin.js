@@ -11,13 +11,25 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-	// const product = new Product(...Object.values(req.body));  // I even don't know what's better
-	const product = new Product(req.body.title,
-		req.body.price,
-		req.body.description,
-		req.body.imageUrl);
-	product.save();
-	res.redirect('/admin/add-product');
+	const title = req.body.title;
+	const price = req.body.price;
+	const description = req.body.description;
+	const imageUrl = req.body.imageUrl;
+	// insert value into table products
+	// it will immidiately save it to database
+	Product.create({
+		// table_field: local constant
+		title: title,
+		price: price,
+		description: description,
+		imageUrl: imageUrl
+	})
+		.then(result => {
+			console.log('postAddProducts OK ');
+		})
+		.catch(err => {
+			console.log('postAddProducts err: ', err)
+		});
 };
 
 exports.getEditProduct = (req, res, next) => {
