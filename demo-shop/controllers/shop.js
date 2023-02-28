@@ -17,35 +17,37 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.fetchAll(cart => {
-    Product.findAll()
-      .then(products => {
-        let productsRender, totalPrice;
-        if (cart.products) {
-          const prodCartId = cart.products.map(prod => prod.prodId);
-          const productsInCart = products.filter(prod => prodCartId.includes(prod.prodId));
-          productsRender = productsInCart.map(prod => {
-            const qty = cart.products.find(pr => pr.prodId == prod.prodId).quantity;
-            return { ...prod, quantity: qty };
-          });
-          totalPrice = cart.totalPrice;
-        } else {
-          productsRender = [];
-          totalPrice = 0;
-        }
+  req.user.getCart()
+    .then(cart => {
+      cart.getProducts()
+        .then(products => {
+          products = products.map(p => p.dataValues);
 
-        res.render('shop/cart', {
-          prods: productsRender,
-          pageTitle: 'Cart',
-          path: '/cart',
-          hasProducts: productsRender.length > 0,
-          activeShop: true,
-          productCSS: true,
-          totalPrice: totalPrice
-        });
-      })
-      .catch(err => { 'shop controllers getCart, err: ', err });
-  });
+          const productsRender = products.map(p => {
+            const q = p.cartItems.quantity;
+            const newProduct = { ...p, quantity: q };
+            return newProduct;
+          });
+          console.log(productsRender);
+          const totalPrice = productsRender.reduce((acc, val) => {
+            return acc + val.quantity * val.price;
+          }, 0);
+
+          console.log('here', totalPrice);
+
+          res.render('shop/cart', {
+            prods: productsRender,
+            pageTitle: 'Cart',
+            path: '/cart',
+            hasProducts: productsRender.length > 0,
+            activeShop: true,
+            productCSS: true,
+            totalPrice: totalPrice
+          });
+        })
+        .catch(err => { 'shop controllers getCart, err1: ', err });
+    })
+    .catch(err => { 'shop controllers getCart, err2: ', err });
 };
 
 exports.getProductDetail = (req, res, next) => {
@@ -76,11 +78,45 @@ exports.getIndex = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.prodId;
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(prodId, product.price);
-  });
-  // console.log(prodId);
-  res.redirect('/products');
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then(cart => {
+      fetchedCart = cart;
+      return cart.getProducts({
+        where: {
+          prodId: prodId
+        }
+      });
+    })
+    .then(products => {
+      let product;
+      if (products.length > 0) {
+        product = products[0];
+      }
+      let newQuantity = 1;
+      if (product) {
+        console.log(product.cartItem);
+        const oldQuantity = product.cartItems.quantity;
+        newQuantity = oldQuantity + 1;
+        return fetchedCart.addProduct(product, {
+          through: { quantity: newQuantity }
+        });
+      }
+      return Product.findByPk(prodId)
+        .then(product => {
+          return fetchedCart.addProduct(product, {
+            through: { quantity: newQuantity }
+          });
+        })
+        .catch(err => { console.log("shop controllers postCart err1: ", err) })
+    })
+    .then(result => {
+      res.redirect('/products');
+    })
+    .catch(err => {
+      console.log('shop controllers postCart err2: ', err);
+    })
 }
 
 exports.getCheckout = (req, res, next) => {
