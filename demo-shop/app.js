@@ -9,6 +9,8 @@ const Product = require('./models/product');
 const User = require('./models/user');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 const app = express();
 
@@ -46,6 +48,11 @@ Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 // this will create cartItems table for the 2nd time
 // Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+// one to many
+User.hasMany(Order);
+// has many
+Order.belongsToMany(Product, { through: OrderItem });
 
 
 //setting up our database
