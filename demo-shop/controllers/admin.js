@@ -17,7 +17,7 @@ exports.postAddProduct = (req, res, next) => {
 	const imageUrl = req.body.imageUrl;
 	// insert value into table products
 	// it will immidiately save it to database
-	Product.create({
+	req.user.createProduct({
 		// table_field: local constant
 		title: title,
 		price: price,
@@ -36,8 +36,10 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
 	const prodId = req.params.prodId;
 	// const editMode = req.query.edit;
-	Product.findByPk(prodId)
-		.then((product) => {
+	// Product.findByPk(prodId)
+	req.user.getProducts({ where: { prodId: prodId } })
+		.then((products) => {
+			const product = products[0];
 			res.render('admin/edit-product', {
 				product: product,
 				pageTitle: "Edit Product",
@@ -82,7 +84,8 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-	Product.findAll()
+	req.user
+		.getProducts()
 		.then(products => {
 			res.render('admin/products', {
 				prods: products,
