@@ -134,17 +134,9 @@ exports.getOrders = (req, res, next) => {
         path: '/orders'
       });
     })
-
     .catch(err => {
       console.log('shop controllers getOrders err: ', err);
     })
-
-
-  // res.render('shop/orders', {
-  //   orders: orders,
-  //   pageTitle: 'Orders',
-  //   path: '/orders'
-  // });
 }
 
 exports.postOrder = (req, res, next) => {
