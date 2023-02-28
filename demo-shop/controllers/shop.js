@@ -28,12 +28,10 @@ exports.getCart = (req, res, next) => {
             const newProduct = { ...p, quantity: q };
             return newProduct;
           });
-          console.log(productsRender);
+
           const totalPrice = productsRender.reduce((acc, val) => {
             return acc + val.quantity * val.price;
           }, 0);
-
-          console.log('here', totalPrice);
 
           res.render('shop/cart', {
             prods: productsRender,
@@ -96,7 +94,6 @@ exports.postCart = (req, res, next) => {
       }
       let newQuantity = 1;
       if (product) {
-        console.log(product.cartItem);
         const oldQuantity = product.cartItems.quantity;
         newQuantity = oldQuantity + 1;
         return fetchedCart.addProduct(product, {
@@ -134,7 +131,18 @@ exports.getOrders = (req, res, next) => {
 }
 
 exports.deleteFromCart = (req, res, next) => {
-  Cart.deleteProoduct(req.body.prodId, req.body.price);
-  console.log(req.body.prodId, req.body.price);
-  res.redirect('/cart');
+  const prodId = req.body.prodId;
+  req.user
+    .getCart()
+    .then(cart => {
+      return cart.getProducts({ where: { prodId: prodId } })
+    })
+    .then(products => {
+      const product = products[0];
+      product.cartItems.destroy();
+    })
+    .then(result => {
+      res.redirect('/cart');
+    })
+    .catch(err => console.log('shop controllers deleteFromCart err: ', err));
 }
