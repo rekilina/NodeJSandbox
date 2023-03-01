@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="card__actions">
                                     <form action="/delete-from-cart" method="POST">
-                                        <input type="hidden" name="prodId" value="<%= product.prodId %>">
+                                        <input type="hidden" name="_id" value="<%= product._id %>">
                                         <input type="hidden" name="price" value="<%= product.price %>">
                                         <button class="btn" type="submit">Remove 1</button>
                                     </form>

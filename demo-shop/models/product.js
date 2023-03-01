@@ -1,65 +1,55 @@
-const fs = require('fs');
-const path = require('path');
-
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'products.json'
-);
-
-const getProductsFromFile = cb => {
-  fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(fileContent));
-    }
-  });
-};
+const getDb = require('../util/database').getDb;
+const ObjectId = require('mongodb').ObjectId;
 
 module.exports = class Product {
-  constructor(title, price, description, imageUrl, prodId) {
+  constructor(title, price, description, imageUrl) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
-    this.prodId = prodId;
   }
 
   save() {
-    getProductsFromFile(products => {
-      let updatedProducts = [...products];
-      if (this.prodId) {
-        console.log('here in class');
-        const existingProductIndex = products.findIndex(p => p.prodId == this.prodId);
-        updatedProducts[existingProductIndex] = this;
-      } else {
-        this.prodId = new String(Math.random());
-        updatedProducts.push(this);
-      }
-      fs.writeFile(p, JSON.stringify(updatedProducts), err => {
+    const db = getDb();
+    return db.collection('products')
+      .insertOne(this)
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => {
         console.log(err);
       });
-    });
   }
 
-  static delete(id) {
-    getProductsFromFile(products => {
-      const updatedProducts = products.filter(prod => prod.prodId != id);
-      fs.writeFile(p, JSON.stringify(updatedProducts), err => {
-        console.log(err);
-      });
-    })
+  static fetchAll() {
+    const db = getDb();
+    return db.collection('products')
+      .find()
+      .toArray()
+      .then((products) => {
+        return products;
+      })
+      .catch((err) => {
+        console.log("admin/getProducts failed");
+      })
   }
 
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+  static findById(prodId, cb) {
+    const db = getDb();
+
+    if (ObjectId.isValid(prodId)) {
+      db.collection('products')
+        .findOne({ _id: new ObjectId(prodId) })
+        .then((product) => {
+          cb(product);
+        })
+        .catch(err => {
+          console.log("getEditProduct err", err);
+        });
+    } else {
+      console.log("wrong _id");
+      res.redirect('/404')
+    }
   }
 
-  static findById(id, cb) {
-    getProductsFromFile(products => {
-      const product = products.find(p => p.prodId == id);
-      cb(product);
-    });
-  }
 };
