@@ -1,0 +1,127 @@
+[{
+  "_id": {
+    "$oid": "63ff28aabda654ff13d17dda"
+  },
+  "title": "Book 01",
+  "author": "Author 1",
+  "rating": 9,
+  "pages": 333,
+  "genres": [
+    "fantasy"
+  ],
+  "reviews": [
+    {
+      "name": "Ivan",
+      "body": "greate book!"
+    },
+    {
+      "name": "Irina",
+      "body": "so-so"
+    },
+    {
+      "name": "Mary",
+      "body": "i liked it"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "63ff2a0dbda654ff13d17ddb"
+  },
+  "title": "Book 02",
+  "author": "Author 2",
+  "rating": 8,
+  "pages": 300,
+  "genres": [
+    "fantasy",
+    "magic"
+  ],
+  "reviews": [
+    {
+      "name": "Ivan",
+      "body": "ok 02"
+    },
+    {
+      "name": "Irina",
+      "body": "so-so"
+    },
+    {
+      "name": "Mary",
+      "body": "i liked it"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "63ff2a0dbda654ff13d17ddc"
+  },
+  "title": "Book 03",
+  "author": "Author 1",
+  "rating": 7,
+  "pages": 400,
+  "genres": [
+    "non-fiction"
+  ],
+  "reviews": [
+    {
+      "name": "Ivan",
+      "body": "ok 03"
+    },
+    {
+      "name": "Irina",
+      "body": "so-so"
+    },
+    {
+      "name": "Mary",
+      "body": "i liked it"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "63ff2a0dbda654ff13d17ddd"
+  },
+  "title": "Book 04",
+  "author": "Author 3",
+  "rating": 8,
+  "pages": 500,
+  "genres": [
+    "comedy"
+  ],
+  "reviews": [
+    {
+      "name": "Ivan",
+      "body": "ok 04"
+    },
+    {
+      "name": "Irina",
+      "body": "so-so"
+    },
+    {
+      "name": "Mary",
+      "body": "i liked it"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "63ff2a0dbda654ff13d17dde"
+  },
+  "title": "Book 05",
+  "author": "Author 2",
+  "rating": 9,
+  "pages": 400,
+  "genres": [
+    "magic"
+  ],
+  "reviews": [
+    {
+      "name": "Ivan",
+      "body": "ok 05"
+    },
+    {
+      "name": "Irina",
+      "body": "so-so"
+    },
+    {
+      "name": "Mary",
+      "body": "i liked it"
+    }
+  ]
+}]
