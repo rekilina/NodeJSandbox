@@ -22,6 +22,11 @@ connectToDb((err) => {
 
 // routes
 app.get('/books', (req, res, next) => {
+	// current page /books?p=10
+	const page = req.query.p || 0;
+	// how many books per page 
+	const booksPerPage = 3;
+
 	let books = [];
 	// find method returns not data, but cursor
 	// toArray, forEach - this is all Cursor methods
@@ -29,6 +34,8 @@ app.get('/books', (req, res, next) => {
 	db.collection('books1')
 		.find()
 		.sort({ author: 1 })
+		.skip(page * booksPerPage)
+		.limit(booksPerPage)
 		.forEach(book => {
 			books.push(book);
 		})
