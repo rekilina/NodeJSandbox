@@ -1,8 +1,6 @@
-const { ObjectId } = require('mongodb');
 const Product = require('../models/product');
 const User = require('../models/user');
-
-
+const Order = require('../models/order');
 
 exports.getIndex = (req, res, next) => {
 	Product.find()
@@ -66,7 +64,6 @@ exports.getCart = (req, res, next) => {
 				quantity: elem.quantity
 			}
 		});
-		console.log(zipProducts);
 		const totalPrice = zipProducts.reduce((acc, curr) => {
 			return acc + Number(curr.quantity) * Number(curr.price);
 		}, 0);
@@ -105,32 +102,31 @@ exports.deleteFromCart = (req, res, next) => {
 
 }
 
-// // exports.getCheckout = (req, res, next) => {
-// //   res.render('shop/sheckout', {
-// //     pageTitle: 'Checkout',
-// //     path: '/checkout'
-// //   });
-// // }
-
-
-// exports.getOrders = (req, res, next) => {
-//   const orders = req.user.getOrders()
-//     .then(orders => {
-
-//       res.render('shop/orders', {
-//         pageTitle: 'Orders',
-//         path: '/orders',
-//         orders: orders
-//       });
-//       console.log(orders);
-//     })
-
-// };
-
-
-// exports.postOrder = (req, res, next) => {
-//   req.user
-//     .addOrder();
-//   res.redirect('/cart');
-
+// exports.getCheckout = (req, res, next) => {
+//   res.render('shop/sheckout', {
+//     pageTitle: 'Checkout',
+//     path: '/checkout'
+//   });
 // }
+
+
+exports.getOrders = (req, res, next) => {
+	Order.find()
+		.then(orders => {
+			res.render('shop/orders', {
+				pageTitle: 'Orders',
+				path: '/orders',
+				orders: orders
+			});
+		})
+
+};
+
+
+exports.postOrder = (req, res, next) => {
+	req.user.addOrder()
+		.then(result => {
+			req.user.clearCart();
+			res.redirect('/cart');
+		});
+}

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const Product = require('./product');
+const Order = require('./order');
 
 const userSchema = new Schema({
 	username: {
@@ -35,7 +36,6 @@ const userSchema = new Schema({
 });
 
 userSchema.methods.addToCart = function (product) {
-	console.log(this);
 	const cartProductIndex = this.cart.items.findIndex(p => {
 		return p._id.equals(product._id);
 	});
@@ -52,7 +52,6 @@ userSchema.methods.addToCart = function (product) {
 }
 
 userSchema.methods.removeFromCart = function (prodId) {
-	console.log(this);
 	const cartProductIndex = this.cart.items.findIndex(p => {
 		return p._id.equals(prodId);
 	});
@@ -74,106 +73,33 @@ userSchema.methods.removeFromCart = function (prodId) {
 	return this.save();
 }
 
+userSchema.methods.clearCart = function () {
+	this.cart.items = [];
+	return this.save();
+}
+
+userSchema.methods.addOrder = function () {
+	return this.populate('cart.items._id')
+		.then(user => {
+			const cartItemsArray = user.cart.items;
+			const zipProducts = cartItemsArray.map(elem => {
+				console.log(elem._id);
+				return {
+					...elem._id._doc,
+					quantity: elem.quantity
+				}
+			});
+			const totalPrice = zipProducts.reduce((acc, curr) => {
+				return acc + Number(curr.quantity) * Number(curr.price);
+			}, 0);
+
+			const order = new Order({
+				userId: this._id,
+				totalPrice: totalPrice.toFixed(2),
+				items: zipProducts
+			});
+			return order.save();
+		});
+}
+
 module.exports = mongoose.model('User', userSchema);
-
-
-
-// class User {
-
-// 	removeFromCart(prodId) {
-// 		const cartProductIndex = this.cart.items.findIndex(p => {
-// 			return p._id.equals(new ObjectId(prodId));  // may be ObjectId
-// 		});
-// 		const cartProduct = this.cart.items.find(p => {
-// 			return p._id.equals(new ObjectId(prodId));  // may be ObjectId
-// 		});
-// 		let updatedCart = { ...this.cart };
-// 		if (cartProduct.quantity === 1) {
-// 			updatedCart.items = updatedCart.items.filter(p => {
-// 				return p._id.toString() !== prodId.toString();
-// 			})
-// 		} else if (cartProduct.quantity > 1) {
-// 			updatedCart.items[cartProductIndex].quantity = cartProduct.quantity - 1;
-// 		} else {
-// 			throw ('quantity err User.removeFromCart');
-// 		}
-// 		const db = getDb();
-// 		return db.collection('users').updateOne(
-// 			{ _id: this._id },
-// 			{ $set: { cart: updatedCart } }
-// 		);
-// 	}
-
-// 	static findById(userId) {
-// 		const db = getDb();
-// 		if (ObjectId.isValid(userId)) {
-// 			return db.collection('users')
-// 				.findOne({ _id: new ObjectId(userId) });
-// 		} else {
-// 			console.log("invalid user_id");
-// 			throw ('invalid _id User');
-// 		}
-// 	}
-
-// 	getCart() {
-// 		return this.cart;
-// 	}
-
-// 	addOrder() {
-// 		const db = getDb();
-// 		let totalPrice = 0;
-
-// 		const productsCart = this.cart.items.map(prod => {
-// 			return { _id: prod._id, quantity: prod.quantity }
-// 		});
-// 		const prodIds = this.cart.items.map(prod => prod._id);
-// 		db.collection('products')
-// 			.find({ _id: { $in: prodIds } })
-// 			.toArray()
-// 			.then((products) => {
-// 				const zipProducts = products.map(prod => {
-// 					return {
-// 						...prod, quantity: productsCart.find(p => {
-// 							return p._id.equals(prod._id)
-// 						}).quantity
-// 					}
-// 				});
-// 				const totalPrice = zipProducts.reduce((acc, curr) => {
-// 					return acc + Number(curr.quantity) * Number(curr.price);
-// 				}, 0);
-
-// 				const order = {
-// 					items: this.cart.items,
-// 					userId: this._id,
-// 					totalPrice: totalPrice
-// 				}
-
-// 				return db.collection('orders')
-// 					.insertOne(order)
-// 					.then(result => {
-// 						this.cart = { items: [] };
-// 						db.collection('users')
-// 							.updateOne(
-// 								{ _id: this._id },
-// 								{ $set: { cart: { items: [] } } }
-// 							)
-// 					})
-// 					.catch(err => {
-// 						console.log('User.addOrder failed: ', err)
-// 					})
-
-// 			})
-// 			.catch((err) => {
-// 				console.log('getCart shop ctrl failed: ', err);
-// 			});
-
-// 	}
-
-// 	getOrders() {
-// 		const db = getDb();
-// 		return db.collection('orders')
-// 			.find({ userId: this._id }).toArray();
-// 	}
-// }
-
-// module.exports = User;
