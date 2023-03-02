@@ -15,6 +15,11 @@ class User {
 		return db.collection('users').insertOne(this)
 	}
 
+	// В общем хранить полное описание товара плохая идея,
+	// Потому что если ты обновишь товар в админке,
+	// В корзине он не обновится
+	// Сейчас уж пусть хранится всё,
+	// Но использовать из этого можно по сути только _id
 	addToCart(product) {
 		const cartProductIndex = this.cart.items.findIndex(p => {
 			return p._id.equals(product._id);
@@ -43,6 +48,10 @@ class User {
 			console.log("invalid user_id");
 			throw ('invalid _id User');
 		}
+	}
+
+	getCart() {
+		return this.cart;
 	}
 
 }
