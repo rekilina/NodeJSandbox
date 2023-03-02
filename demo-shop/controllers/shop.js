@@ -84,14 +84,13 @@ exports.getProductDetail = (req, res, next) => {
 //   });
 // };
 
-// exports.postCart = (req, res, next) => {
-//   const prodId = req.body.prodId;
-//   Product.findById(prodId, (product) => {
-//     Cart.addProduct(prodId, product.price);
-//   });
-//   // console.log(prodId);
-//   res.redirect('/products');
-// }
+exports.postCart = (req, res, next) => {
+  const prodId = req.body._id;
+  Product.findById(prodId, (product) => {
+    req.user.addToCart(product);
+    res.redirect('/products');
+  });
+}
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/sheckout', {

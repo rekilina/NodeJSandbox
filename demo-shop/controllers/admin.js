@@ -108,24 +108,5 @@ exports.getProducts = (req, res, next) => {
 			res.status(500).json({ err: "controller admin/getProducts failed" });
 			console.log(err);
 		})
-	// const db = getDb();
-	// db.collection('products')
-	// 	.find()
-	// 	.forEach(product => {
-	// 		products.push(product);
-	// 	})
-	// 	.then(() => {
-	// 		res.status(200);
-	// 		res.render('admin/products', {
-	// 			prods: products,
-	// 			pageTitle: 'Admin products',
-	// 			path: '/admin/products',
-	// 			hasProducts: products.length > 0,
-	// 			activeShop: true,
-	// 			productCSS: true
-	// 		});
-	// 	})
-	// 	.catch((err) => {
-	// 		res.status(500).json({ err: "admin/getProducts failed" });
-	// 	})
+
 };
