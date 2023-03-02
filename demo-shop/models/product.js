@@ -1,55 +1,66 @@
-const getDb = require('../util/database').getDb;
-const ObjectId = require('mongodb').ObjectId;
+const mongoose = require('mongoose');
 
-module.exports = class Product {
-  constructor(title, price, description, imageUrl) {
-    this.title = title;
-    this.price = price;
-    this.description = description;
-    this.imageUrl = imageUrl;
-  }
+const Schema = mongoose.Schema;
 
-  save() {
-    const db = getDb();
-    return db.collection('products')
-      .insertOne(this)
-      .then(result => {
-        console.log(result);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
+const productSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+    default: 'New Product'
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  description: String,
+  imageUrl: String
+});
 
-  static fetchAll() {
-    const db = getDb();
-    return db.collection('products')
-      .find()
-      .toArray()
-      .then((products) => {
-        return products;
-      })
-      .catch((err) => {
-        console.log("admin/getProducts failed");
-      })
-  }
+module.exports = mongoose.model('Product', productSchema);
 
-  static findById(prodId, cb) {
-    const db = getDb();
 
-    if (ObjectId.isValid(prodId)) {
-      db.collection('products')
-        .findOne({ _id: new ObjectId(prodId) })
-        .then((product) => {
-          cb(product);
-        })
-        .catch(err => {
-          console.log("getEditProduct err", err);
-        });
-    } else {
-      console.log("wrong _id");
-      res.redirect('/404')
-    }
-  }
 
-};
+
+
+
+
+
+// module.exports = class Product {
+//   constructor(title, price, description, imageUrl) {
+//     this.title = title;
+//     this.price = price;
+//     this.description = description;
+//     this.imageUrl = imageUrl;
+//   }
+
+//   save() {
+//     const db = getDb();
+//     return db.collection('products')
+//       .insertOne(this)
+//       .then(result => {
+//         console.log(result);
+//       })
+//       .catch(err => {
+//         console.log(err);
+//       });
+//   }
+
+//   static findById(prodId, cb) {
+//     const db = getDb();
+
+//     if (ObjectId.isValid(prodId)) {
+//       db.collection('products')
+//         .findOne({ _id: new ObjectId(prodId) })
+//         .then((product) => {
+//           cb(product);
+//         })
+//         .catch(err => {
+//           console.log("getEditProduct err", err);
+//         });
+//     } else {
+//       console.log("wrong _id");
+//       res.redirect('/404')
+//     }
+//   }
+
+// };

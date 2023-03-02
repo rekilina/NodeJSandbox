@@ -1,7 +1,4 @@
 const Product = require('../models/product');
-const ObjectId = require('mongodb').ObjectId;
-
-const getDb = require('../util/database').getDb;
 
 exports.getAddProduct = (req, res, next) => {
 	res.render('admin/add-product', {
@@ -15,11 +12,14 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
 	const product = new Product(
-		req.body.title,
-		req.body.price,
-		req.body.description,
-		req.body.imageUrl);
-	product.save()
+		{
+			title: req.body.title,
+			price: req.body.price,
+			description: req.body.description,
+			imageUrl: req.body.imageUrl
+		});
+	product
+		.save() // method provided by mongoose
 		.then(() => {
 			res.status(200);
 			res.redirect('/admin/add-product');
@@ -32,19 +32,20 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
 	const prodId = req.params.prodId;
 
-	Product.findById(prodId, (product) => {
-		res.status(200);
-		res.render('admin/edit-product', {
-			product: product,
-			pageTitle: "Edit Product",
-			path: '/admin/edit-product'
-		});
-	})
+	Product.findById(prodId)
+		.then((product) => {
+			res.status(200);
+			res.render('admin/edit-product', {
+				product: product,
+				pageTitle: "Edit Product",
+				path: '/admin/edit-product'
+			});
+		})
 
 };
 
 exports.postEditProduct = (req, res, next) => {
-	const db = getDb();
+
 	const updates = {
 		title: req.body.title,
 		description: req.body.description,
@@ -53,47 +54,45 @@ exports.postEditProduct = (req, res, next) => {
 	};
 	const prodId = req.body._id;
 
-	if (ObjectId.isValid(prodId)) {
-		db.collection('products')
-			.updateOne(
-				{ _id: new ObjectId(prodId) },
-				{ $set: updates }
-			)
-			.then(result => {
-				res.status(200).redirect("/admin/products");
-			})
-			.catch(err => {
-				res.status(500).json({ error: 'update failed: ' + err });
-				console.log('update failed', err);
-			})
-	} else {
-		res.status(500).json({ error: 'update failed' });
-		console.log('update failed');
-	}
+	Product.findById(prodId)
+		.then(product => {
+			product.title = req.body.title;
+			product.description = req.body.description;
+			product.price = req.body.price;
+			product.imageUrl = req.body.imageUrl;
+			return product.save();
+		})
+		.then(result => {
+			res.redirect('/admin/products');
+		})
+		.catch(err => {
+			res.status(500).json({ error: 'update failed: ' + err });
+			console.log('update failed', err);
+		})
 }
 
-exports.postDeleteProduct = (req, res, next) => {
-	const db = getDb();
-	const prodId = req.body._id;
-	if (ObjectId.isValid(prodId)) {
-		db.collection('products')
-			.deleteOne({ _id: new ObjectId(prodId) })
-			.then(result => {
-				res.status(200).redirect("/admin/products");
-				return result;
-			})
-			.catch(err => {
-				res.status(500).json({ error: 'delete failed: ' + err });
-				console.log('update failed', err);
-			})
-	} else {
-		console.log('update failed');
-		throw ('update failed');
-	}
-}
+// exports.postDeleteProduct = (req, res, next) => {
+// 	const db = getDb();
+// 	const prodId = req.body._id;
+// 	if (ObjectId.isValid(prodId)) {
+// 		db.collection('products')
+// 			.deleteOne({ _id: new ObjectId(prodId) })
+// 			.then(result => {
+// 				res.status(200).redirect("/admin/products");
+// 				return result;
+// 			})
+// 			.catch(err => {
+// 				res.status(500).json({ error: 'delete failed: ' + err });
+// 				console.log('update failed', err);
+// 			})
+// 	} else {
+// 		console.log('update failed');
+// 		throw ('update failed');
+// 	}
+// }
 
 exports.getProducts = (req, res, next) => {
-	Product.fetchAll()
+	Product.find()
 		.then(products => {
 			res.render('admin/products', {
 				prods: products,
