@@ -78,6 +78,86 @@ class User {
 		return this.cart;
 	}
 
+	addOrder() {
+		const db = getDb();
+		let totalPrice = 0;
+
+
+
+
+		const productsCart = this.cart.items.map(prod => {
+			return { _id: prod._id, quantity: prod.quantity }
+		});
+		const prodIds = this.cart.items.map(prod => prod._id);
+		db.collection('products')
+			.find({ _id: { $in: prodIds } })
+			.toArray()
+			.then((products) => {
+				const zipProducts = products.map(prod => {
+					return {
+						...prod, quantity: productsCart.find(p => {
+							return p._id.equals(prod._id)
+						}).quantity
+					}
+				});
+				const totalPrice = zipProducts.reduce((acc, curr) => {
+					return acc + Number(curr.quantity) * Number(curr.price);
+				}, 0);
+
+
+				const order = {
+					items: this.cart.items,
+					userId: this._id,
+					totalPrice: totalPrice
+				}
+
+
+
+				return db.collection('orders')
+					.insertOne(order)
+					.then(result => {
+						this.cart = { items: [] };
+						db.collection('users')
+							.updateOne(
+								{ _id: this._id },
+								{ $set: { cart: { items: [] } } }
+							)
+					})
+					.catch(err => {
+						console.log('User.addOrder failed: ', err)
+					})
+
+
+
+
+
+
+
+
+			})
+			.catch((err) => {
+				console.log('getCart shop ctrl failed: ', err);
+			});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
+
+	getOrder() {
+
+	}
 }
 
 module.exports = User;
