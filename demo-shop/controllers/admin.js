@@ -71,25 +71,19 @@ exports.postEditProduct = (req, res, next) => {
 		})
 }
 
-// exports.postDeleteProduct = (req, res, next) => {
-// 	const db = getDb();
-// 	const prodId = req.body._id;
-// 	if (ObjectId.isValid(prodId)) {
-// 		db.collection('products')
-// 			.deleteOne({ _id: new ObjectId(prodId) })
-// 			.then(result => {
-// 				res.status(200).redirect("/admin/products");
-// 				return result;
-// 			})
-// 			.catch(err => {
-// 				res.status(500).json({ error: 'delete failed: ' + err });
-// 				console.log('update failed', err);
-// 			})
-// 	} else {
-// 		console.log('update failed');
-// 		throw ('update failed');
-// 	}
-// }
+exports.postDeleteProduct = (req, res, next) => {
+	const prodId = req.body._id;
+	Product
+		.findByIdAndRemove(prodId)
+		.then(result => {
+			res.status(200).redirect("/admin/products");
+			return result;
+		})
+		.catch(err => {
+			res.status(500).json({ error: 'delete failed: ' + err });
+			console.log('update failed', err);
+		})
+}
 
 exports.getProducts = (req, res, next) => {
 	Product.find()
