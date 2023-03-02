@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const Product = require('../models/product');
-// const Cart = require('../models/cart');
+const User = require('../models/user');
 
 
 
@@ -55,64 +55,55 @@ exports.getProductDetail = (req, res, next) => {
 		});
 }
 
+exports.getCart = (req, res, next) => {
+	const cart = req.user.cart;
+	req.user.populate('cart.items._id').then(user => {
+		const cartItemsArray = user.cart.items;
+		const zipProducts = cartItemsArray.map(elem => {
+			console.log(elem._id);
+			return {
+				...elem._id._doc,
+				quantity: elem.quantity
+			}
+		});
+		console.log(zipProducts);
+		const totalPrice = zipProducts.reduce((acc, curr) => {
+			return acc + Number(curr.quantity) * Number(curr.price);
+		}, 0);
+		res.render('shop/cart', {
+			prods: zipProducts,
+			pageTitle: 'Cart',
+			path: '/cart',
+			hasProducts: zipProducts.length > 0,
+			activeShop: true,
+			productCSS: true,
+			totalPrice: totalPrice
+		});
+	})
+}
 
-// exports.getCart = (req, res, next) => {
-//   const db = getDb();
-//   const productsCart = req.user.getCart().items.map(prod => {
-//     return { _id: prod._id, quantity: prod.quantity }
-//   });
-//   const prodIds = req.user.getCart().items.map(prod => prod._id);
-//   db.collection('products')
-//     .find({ _id: { $in: prodIds } })
-//     .toArray()
-//     .then((products) => {
-//       const zipProducts = products.map(prod => {
-//         return {
-//           ...prod, quantity: productsCart.find(p => {
-//             return p._id.equals(prod._id)
-//           }).quantity
-//         }
-//       });
-//       const totalPrice = zipProducts.reduce((acc, curr) => {
-//         return acc + Number(curr.quantity) * Number(curr.price);
-//       }, 0);
-//       res.render('shop/cart', {
-//         prods: zipProducts,
-//         pageTitle: 'Cart',
-//         path: '/cart',
-//         hasProducts: products.length > 0,
-//         activeShop: true,
-//         productCSS: true,
-//         totalPrice: totalPrice
-//       });
-//     })
-//     .catch((err) => {
-//       console.log('getCart shop ctrl failed: ', err);
-//     });
+exports.postCart = (req, res, next) => {
+	const prodId = req.body._id;
+	Product.findById(prodId)
+		.then((product) => {
+			req.user.addToCart(product);
+			res.redirect('/products');
+		});
+}
 
-// };
+exports.deleteFromCart = (req, res, next) => {
+	const prodId = req.body._id;
 
-// exports.postCart = (req, res, next) => {
-//   const prodId = req.body._id;
-//   Product.findById(prodId, (product) => {
-//     req.user.addToCart(product);
-//     res.redirect('/products');
-//   });
-// }
+	req.user.removeFromCart(prodId)
+		.then(result => {
+			console.log('removed from cart, ', result);
+			res.redirect('/cart');
+		})
+		.catch(err => {
+			console.log('fail removing from cart, ', err)
+		})
 
-// exports.deleteFromCart = (req, res, next) => {
-//   const prodId = req.body._id;
-
-//   req.user.removeFromCart(prodId)
-//     .then(result => {
-//       console.log('removed from cart, ', result);
-//       res.redirect('/cart');
-//     })
-//     .catch(err => {
-//       console.log('fail removing from cart, ', err)
-//     })
-
-// }
+}
 
 // // exports.getCheckout = (req, res, next) => {
 // //   res.render('shop/sheckout', {

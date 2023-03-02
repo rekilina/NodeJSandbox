@@ -21,6 +21,7 @@ const userSchema = new Schema({
 				_id: {
 					type: Schema.Types.ObjectId,
 					required: true,
+					ref: 'Product'
 				},
 				quantity: {
 					type: Number,
@@ -33,46 +34,51 @@ const userSchema = new Schema({
 	}
 });
 
+userSchema.methods.addToCart = function (product) {
+	console.log(this);
+	const cartProductIndex = this.cart.items.findIndex(p => {
+		return p._id.equals(product._id);
+	});
+	let newQuantity = 1;
+	let updatedCart = { ...this.cart };
+	if (cartProductIndex >= 0) {
+		newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+		updatedCart.items[cartProductIndex].quantity = newQuantity;
+	} else { ///_id: product._id or ...product
+		updatedCart.items.push({ _id: product._id, quantity: 1 });
+	}
+	this.cart = updatedCart;
+	return this.save();
+}
+
+userSchema.methods.removeFromCart = function (prodId) {
+	console.log(this);
+	const cartProductIndex = this.cart.items.findIndex(p => {
+		return p._id.equals(prodId);
+	});
+	const cartProduct = this.cart.items.find(p => {
+		return p._id.equals(prodId);
+	});
+	let newQuantity = 1;
+	let updatedCart = { ...this.cart };
+	if (cartProduct.quantity === 1) {
+		updatedCart.items = updatedCart.items.filter(p => {
+			return p._id.toString() !== prodId.toString();
+		})
+	} else if (cartProduct.quantity > 1) {
+		updatedCart.items[cartProductIndex].quantity = cartProduct.quantity - 1;
+	} else {
+		throw ('quantity err User.removeFromCart');
+	}
+	this.cart = updatedCart;
+	return this.save();
+}
+
 module.exports = mongoose.model('User', userSchema);
 
 
 
 // class User {
-// 	constructor(username, email, cart, _id) {
-// 		this.username = username;
-// 		this.email = email;
-// 		this.cart = cart; // {items: []}
-// 		this._id = _id ? new ObjectId(_id) : null;
-// 	}
-
-// 	save() {
-// 		const db = getDb();
-// 		return db.collection('users').insertOne(this)
-// 	}
-
-// 	// В общем хранить полное описание товара плохая идея,
-// 	// Потому что если ты обновишь товар в админке,
-// 	// В корзине он не обновится
-// 	// Сейчас уж пусть хранится всё,
-// 	// Но использовать из этого можно по сути только _id
-// 	addToCart(product) {
-// 		const cartProductIndex = this.cart.items.findIndex(p => {
-// 			return p._id.equals(product._id);
-// 		});
-// 		let newQuantity = 1;
-// 		let updatedCart = { ...this.cart };
-// 		if (cartProductIndex >= 0) {
-// 			newQuantity = this.cart.items[cartProductIndex].quantity + 1;
-// 			updatedCart.items[cartProductIndex].quantity = newQuantity;
-// 		} else { ///_id: product._id or ...product
-// 			updatedCart.items.push({ _id: product._id, quantity: 1 });
-// 		}
-// 		const db = getDb();
-// 		return db.collection('users').updateOne(
-// 			{ _id: this._id },
-// 			{ $set: { cart: updatedCart } }
-// 		);
-// 	}
 
 // 	removeFromCart(prodId) {
 // 		const cartProductIndex = this.cart.items.findIndex(p => {

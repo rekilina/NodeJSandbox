@@ -12,11 +12,11 @@ router.get('/products', shopController.getProducts);
 
 router.get('/products/:prodId', shopController.getProductDetail);
 
-// router.get('/cart', shopController.getCart);
+router.get('/cart', shopController.getCart);
 
-// router.post('/cart', shopController.postCart);
+router.post('/cart', shopController.postCart);
 
-// router.post('/delete-from-cart', shopController.deleteFromCart);
+router.post('/delete-from-cart', shopController.deleteFromCart);
 
 // router.get('/orders', shopController.getOrders);
 
