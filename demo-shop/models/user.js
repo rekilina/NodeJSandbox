@@ -39,6 +39,30 @@ class User {
 		);
 	}
 
+	removeFromCart(prodId) {
+		const cartProductIndex = this.cart.items.findIndex(p => {
+			return p._id.equals(new ObjectId(prodId));  // may be ObjectId
+		});
+		const cartProduct = this.cart.items.find(p => {
+			return p._id.equals(new ObjectId(prodId));  // may be ObjectId
+		});
+		let updatedCart = { ...this.cart };
+		if (cartProduct.quantity === 1) {
+			updatedCart.items = updatedCart.items.filter(p => {
+				return p._id.toString() !== prodId.toString();
+			})
+		} else if (cartProduct.quantity > 1) {
+			updatedCart.items[cartProductIndex].quantity = cartProduct.quantity - 1;
+		} else {
+			throw ('quantity err User.removeFromCart');
+		}
+		const db = getDb();
+		return db.collection('users').updateOne(
+			{ _id: this._id },
+			{ $set: { cart: updatedCart } }
+		);
+	}
+
 	static findById(userId) {
 		const db = getDb();
 		if (ObjectId.isValid(userId)) {

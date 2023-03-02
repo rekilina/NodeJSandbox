@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const Product = require('../models/product');
 // const Cart = require('../models/cart');
 
@@ -98,6 +99,20 @@ exports.postCart = (req, res, next) => {
   });
 }
 
+exports.deleteFromCart = (req, res, next) => {
+  const prodId = req.body._id;
+
+  req.user.removeFromCart(prodId)
+    .then(result => {
+      console.log('removed from cart, ', result);
+      res.redirect('/cart');
+    })
+    .catch(err => {
+      console.log('fail removing from cart, ', err)
+    })
+
+}
+
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/sheckout', {
 //     pageTitle: 'Checkout',
@@ -112,8 +127,3 @@ exports.postCart = (req, res, next) => {
 //   });
 // }
 
-// exports.deleteFromCart = (req, res, next) => {
-//   Cart.deleteProoduct(req.body.prodId, req.body.price);
-//   console.log(req.body.prodId, req.body.price);
-//   res.redirect('/cart');
-// }
