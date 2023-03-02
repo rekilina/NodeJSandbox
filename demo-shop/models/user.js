@@ -82,9 +82,6 @@ class User {
 		const db = getDb();
 		let totalPrice = 0;
 
-
-
-
 		const productsCart = this.cart.items.map(prod => {
 			return { _id: prod._id, quantity: prod.quantity }
 		});
@@ -104,14 +101,11 @@ class User {
 					return acc + Number(curr.quantity) * Number(curr.price);
 				}, 0);
 
-
 				const order = {
 					items: this.cart.items,
 					userId: this._id,
 					totalPrice: totalPrice
 				}
-
-
 
 				return db.collection('orders')
 					.insertOne(order)
@@ -127,36 +121,17 @@ class User {
 						console.log('User.addOrder failed: ', err)
 					})
 
-
-
-
-
-
-
-
 			})
 			.catch((err) => {
 				console.log('getCart shop ctrl failed: ', err);
 			});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 
-	getOrder() {
-
+	getOrders() {
+		const db = getDb();
+		return db.collection('orders')
+			.find({ userId: this._id }).toArray();
 	}
 }
 

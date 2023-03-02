@@ -122,38 +122,16 @@ exports.deleteFromCart = (req, res, next) => {
 
 
 exports.getOrders = (req, res, next) => {
-  const db = getDb();
-  const productsCart = req.user.getCart().items.map(prod => {
-    return { _id: prod._id, quantity: prod.quantity }
-  });
-  const prodIds = req.user.getCart().items.map(prod => prod._id);
-  db.collection('products')
-    .find({ _id: { $in: prodIds } })
-    .toArray()
-    .then((products) => {
-      const zipProducts = products.map(prod => {
-        return {
-          ...prod, quantity: productsCart.find(p => {
-            return p._id.equals(prod._id)
-          }).quantity
-        }
-      });
-      const totalPrice = zipProducts.reduce((acc, curr) => {
-        return acc + Number(curr.quantity) * Number(curr.price);
-      }, 0);
+  const orders = req.user.getOrders()
+    .then(orders => {
+
       res.render('shop/orders', {
-        prods: zipProducts,
         pageTitle: 'Orders',
         path: '/orders',
-        hasProducts: products.length > 0,
-        activeShop: true,
-        productCSS: true,
-        totalPrice: totalPrice
+        orders: orders
       });
+      console.log(orders);
     })
-    .catch((err) => {
-      console.log('getCart shop ctrl failed: ', err);
-    });
 
 };
 
@@ -162,10 +140,5 @@ exports.postOrder = (req, res, next) => {
   req.user
     .addOrder();
   res.redirect('/cart');
-  // .then(result => {
-  //   res.redirect('/cart');
-  // })
-  // .catch(err => {
-  //   console.log('postOrder failed: ', err)
-  // })
+
 }
