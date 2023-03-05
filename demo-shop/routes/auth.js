@@ -3,12 +3,10 @@ const express = require('express');
 
 const router = express.Router();
 
-router.get('/login', (req, res, next) => {
-	res.render('auth', {
-		pageTitle: 'Login Page',
-		path: '/login'
-	});
-});
+const authController = require('../controllers/auth');
 
+router.get('/login', authController.getLogin);
+
+router.post('/login', authController.postLogin);
 
 module.exports = router;
