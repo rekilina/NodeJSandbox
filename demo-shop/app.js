@@ -40,17 +40,6 @@ app.use(session({
 	store: store
 }));
 
-app.use((req, res, next) => {
-	User.findById('64009e0cb2e1b8f4fca436e0')
-		.then(user => {
-			req.user = user;
-			next();
-		})
-		.catch(err => {
-			console.log('Middleware User err: ', err);
-		})
-});
-
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
