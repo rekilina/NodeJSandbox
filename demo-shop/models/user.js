@@ -37,7 +37,11 @@ const userSchema = new Schema({
 
 userSchema.methods.addToCart = function (product) {
 	const cartProductIndex = this.cart.items.findIndex(p => {
-		return p._id.equals(product._id);
+		if (p) {
+			return p._id.equals(product._id);
+		} else {
+			return null;
+		}
 	});
 	let newQuantity = 1;
 	let updatedCart = { ...this.cart };

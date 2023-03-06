@@ -61,7 +61,6 @@ exports.getCart = (req, res, next) => {
 	req.user.populate('cart.items._id').then(user => {
 		const cartItemsArray = user.cart.items;
 		const zipProducts = cartItemsArray.map(elem => {
-			console.log(elem._id);
 			return {
 				...elem._id._doc,
 				quantity: elem.quantity
@@ -97,7 +96,6 @@ exports.deleteFromCart = (req, res, next) => {
 
 	req.user.removeFromCart(prodId)
 		.then(result => {
-			console.log('removed from cart, ', result);
 			res.redirect('/cart');
 		})
 		.catch(err => {
