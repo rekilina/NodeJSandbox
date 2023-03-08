@@ -6,9 +6,9 @@ const mongoose = require('mongoose');
 const { mongoPassword, mongoLogin, secret } = require('./util/credentials');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
 
 const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/testdb?retryWrites=true&w=majority`;
-
 
 const errorController = require('./controllers/error');
 
@@ -21,6 +21,9 @@ const store = new MongoDBStore({
 	uri: MONGODB_URI,
 	collection: 'sessions'
 });
+
+// initialize csrf protection
+const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -39,6 +42,7 @@ app.use(session({
 	// cookie: {}
 	store: store
 }));
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
 	if (!req.session.user) {
@@ -52,6 +56,12 @@ app.use((req, res, next) => {
 		.catch(err => {
 			console.log('Middleware User err: ', err);
 		})
+});
+
+app.use((req, res, next) => {
+	res.locals.isAuthenticated = req.session.isLoggedIn;
+	res.locals.csrfToken = req.csrfToken();
+	next();
 });
 
 app.use('/admin', adminRoutes);
