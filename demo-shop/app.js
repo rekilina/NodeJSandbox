@@ -7,6 +7,7 @@ const { mongoPassword, mongoLogin, secret } = require('./util/credentials');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/testdb?retryWrites=true&w=majority`;
 
@@ -24,6 +25,7 @@ const store = new MongoDBStore({
 
 // initialize csrf protection
 const csrfProtection = csrf();
+app.use(flash());
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');

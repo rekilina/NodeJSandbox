@@ -7,6 +7,9 @@
 		<%- include('../includes/navigation.ejs') %>
 			<h1>Login page</h1>
 			<main>
+				<div>
+					<%= errorMessage %>
+				</div>
 				<form class="product-form" action="/login" method="POST">
 					<div class="form-control">
 						<label for="title">Email</label>
