@@ -6,10 +6,9 @@ const Product = require('./product');
 const Order = require('./order');
 
 const userSchema = new Schema({
-	username: {
+	password: {
 		type: String,
-		required: true,
-		default: 'Ivan Test'
+		required: true
 	},
 	email: {
 		type: String,
