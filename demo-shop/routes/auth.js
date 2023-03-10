@@ -1,5 +1,6 @@
 
 const express = require('express');
+const { check } = require('express-validator');
 
 const router = express.Router();
 
@@ -11,7 +12,16 @@ router.post('/login', authController.postLogin);
 
 router.get('/signup', authController.getSignup);
 
-router.post('/signup', authController.postSignup);
+router.post('/signup',
+	check('email').isEmail().withMessage('invalid email'),
+	check('password').isStrongPassword(),
+	check('confirm_password').custom((value, { req }) => {
+		if (value !== req.body.password) {
+			throw new Error('passwords dont match');
+		}
+		return true;
+	}),
+	authController.postSignup);
 
 router.post('/logout', authController.postLogout);
 

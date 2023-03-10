@@ -5,24 +5,29 @@
 
 	<body>
 		<%- include('../includes/navigation.ejs') %>
-			<h1>Login page</h1>
-			<main>
-				<form class="product-form" action="/signup" method="POST">
-					<div class="form-control">
-						<label for="title">Email</label>
-						<input type="email" name="email" id="email">
-					</div>
-					<div class="form-control">
-						<label for="password">Password</label>
-						<input type="password" name="password" id="password">
-					</div>
-					<div class="form-control">
-						<label for="password">Confirm Password</label>
-						<input type="password" name="confirm_password" id="confirm_password">
-					</div>
-					<input type="hidden" name="_csrf" value="<%= csrfToken %>">
-					<button class="btn" type="submit">Signup</button>
-				</form>
-			</main>
+			<h1>Signup page</h1>
+			<% if(errorMessage) { %>
+				<div class="centered">
+					<%= errorMessage %>
+				</div>
+				<% } %>
+					<main>
+						<form novalidate class="product-form" action="/signup" method="POST">
+							<div class="form-control">
+								<label for="title">Email</label>
+								<input type="email" name="email" id="email">
+							</div>
+							<div class="form-control">
+								<label for="password">Password</label>
+								<input type="password" name="password" id="password">
+							</div>
+							<div class="form-control">
+								<label for="password">Confirm Password</label>
+								<input type="password" name="confirm_password" id="confirm_password">
+							</div>
+							<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+							<button class="btn" type="submit">Signup</button>
+						</form>
+					</main>
 
-			<%- include('../includes/end.ejs') %>
+					<%- include('../includes/end.ejs') %>
