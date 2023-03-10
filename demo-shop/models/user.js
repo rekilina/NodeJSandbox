@@ -15,6 +15,8 @@ const userSchema = new Schema({
 		required: true,
 		default: 'test@test.com'
 	},
+	resetToken: String,
+	resetTokenExpiration: Date,
 	cart: {
 		items: {
 			type: [{
