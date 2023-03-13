@@ -30,6 +30,7 @@
     "nodemailer": "^6.9.1",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "pdf-creator-node": "^2.3.5",
+    "pdfkit": "^0.13.0",
     "pug": "^2.0.3"
   }
 }

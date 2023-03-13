@@ -4,6 +4,9 @@ const { ObjectId } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const e = require('connect-flash');
+const PDFDocument = require('pdfkit');
+const ejs = require('ejs');
+const pdf = require("pdf-creator-node");
 
 const rootDir = path.dirname(require.main.filename);
 
@@ -135,7 +138,7 @@ exports.postOrder = (req, res, next) => {
 
 exports.getInvoice = (req, res, next) => {
 	const orderId = req.params.orderId;
-	const invoiceName = 'invoice_' + String(orderId) + '.txt';
+	const invoiceName = 'invoice_' + String(orderId) + '.pdf';
 	const invoicePath = path.join(rootDir, 'data', invoiceName);
 
 	const userId = req.session.user._id;
@@ -163,11 +166,30 @@ exports.getInvoice = (req, res, next) => {
 					}
 				})
 			}
-			fs.writeFileSync(invoicePath,
-				JSON.stringify(invoice),
-				err => {
-					console.log('failed writing file: ', err);
-				});
+			// fs.writeFileSync(invoicePath,
+			// 	JSON.stringify(invoice),
+			// 	err => {
+			// 		console.log('failed writing file: ', err);
+			// 	});
+
+			res.header('Content-Type', 'application/pdf');
+			res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
+
+			const invoiceDoc = new PDFDocument();
+			invoiceDoc.pipe(fs.createWriteStream(invoicePath));
+			invoiceDoc.pipe(res);
+			// invoiceDoc.text(invoice);
+
+			invoiceDoc.fontSize(26).text('Invoice', {
+				underlined: true
+			});
+			invoiceDoc.text('---------------------------');
+			order.items.forEach(item => {
+				invoiceDoc.text(item.title + ' x ' + item.quantity + ' x ' + item.price);
+			})
+			invoiceDoc.text('Total: ' + order.totalPrice);
+
+			invoiceDoc.end();
 		})
 		.then((err) => {
 			// ok so i've created file now I want to download it 
@@ -184,10 +206,10 @@ exports.getInvoice = (req, res, next) => {
 			// 	res.send(data);
 			// });
 
-			const file = fs.createReadStream(invoicePath);
-			res.header('Content-Type', 'text/plain');
-			res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
-			file.pipe(res);
+			// const file = fs.createReadStream(invoicePath);
+			// res.header('Content-Type', 'text/plain');
+			// res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
+			// file.pipe(res);
 		})
 		.catch(err => {
 			console.log('find order by id failed: ', err.message);
