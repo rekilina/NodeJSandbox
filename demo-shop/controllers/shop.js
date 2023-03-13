@@ -142,6 +142,9 @@ exports.getInvoice = (req, res, next) => {
 
 	Order.findById(new ObjectId(orderId))
 		.then(order => {
+			if (!order) {
+				return next(new Error('Order not found'));
+			}
 			if (userId.toString() !== order.userId.toString()) {
 				// res.status(401).redirect('/login');
 				throw new Error('Unauthorized access');
@@ -169,16 +172,22 @@ exports.getInvoice = (req, res, next) => {
 		.then((err) => {
 			// ok so i've created file now I want to download it 
 			// IF it was created successfully
-			fs.readFile(invoicePath, (err, data) => {
-				if (err) {
-					console.log('We have an error and we are in then block', err);
-					return next(err);
-				}
-				res.header('Content-Type', 'text/plain');
-				// this header is necessary
-				res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
-				res.send(data);
-			});
+
+			// fs.readFile(invoicePath, (err, data) => {
+			// 	if (err) {
+			// 		console.log('We have an error and we are in then block', err);
+			// 		return next(err);
+			// 	}
+			// 	res.header('Content-Type', 'text/plain');
+			// 	// this header is necessary
+			// 	res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
+			// 	res.send(data);
+			// });
+
+			const file = fs.createReadStream(invoicePath);
+			res.header('Content-Type', 'text/plain');
+			res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
+			file.pipe(res);
 		})
 		.catch(err => {
 			console.log('find order by id failed: ', err.message);
