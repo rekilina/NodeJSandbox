@@ -170,7 +170,7 @@ exports.getInvoice = (req, res, next) => {
 				}
 				res.header('Content-Type', 'text/plain');
 				// this header is necessary
-				res.header('Content-Disposition', 'attachment');
+				res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
 				res.send(data);
 			});
 		})
