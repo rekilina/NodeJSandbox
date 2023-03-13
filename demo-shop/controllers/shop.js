@@ -3,6 +3,7 @@ const Order = require('../models/order');
 const { ObjectId } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
+const e = require('connect-flash');
 
 const rootDir = path.dirname(require.main.filename);
 
@@ -137,7 +138,17 @@ exports.getInvoice = (req, res, next) => {
 	const invoiceName = 'invoice_' + String(orderId) + '.txt';
 	const invoicePath = path.join(rootDir, 'data', invoiceName);
 
+	const userId = req.session.user._id;
+
 	Order.findById(new ObjectId(orderId))
+		.then(order => {
+			if (userId.toString() !== order.userId.toString()) {
+				// res.status(401).redirect('/login');
+				throw new Error('Unauthorized access');
+			} else {
+				return order;
+			}
+		})
 		.then(order => {
 			const invoice = {
 				id: order._id,
@@ -154,13 +165,8 @@ exports.getInvoice = (req, res, next) => {
 				err => {
 					console.log('failed writing file: ', err);
 				});
-			// return order;
 		})
-		.catch(err => {
-			console.log('find order by id failed: ', err);
-			return next(err);
-		})
-		.then(() => {
+		.then((err) => {
 			// ok so i've created file now I want to download it 
 			// IF it was created successfully
 			fs.readFile(invoicePath, (err, data) => {
@@ -174,5 +180,9 @@ exports.getInvoice = (req, res, next) => {
 				res.send(data);
 			});
 		})
-
+		.catch(err => {
+			console.log('find order by id failed: ', err.message);
+			return res.status(301).redirect('/login');
+			// return next();
+		})
 }
