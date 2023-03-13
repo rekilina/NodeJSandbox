@@ -8,6 +8,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/testdb?retryWrites=true&w=majority`;
 
@@ -34,8 +35,36 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
+const fileStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, './data/images');
+	},
+	filename: (req, file, cb) => {
+		const date = Date.now();
+		const filename = date + '-' + file.originalname;
+		// req.body.filename = filename;
+		cb(null, filename);
+	}
+});
+
+const fileFilter = (req, file, cb) => {
+	if (file.mimetype === 'image/png' ||
+		file.mimetype === 'image/jpg' ||
+		file.mimetype === 'image/jpeg' ||
+		file.mimetype === 'image/webp') {
+		cb(null, true);
+	} else {
+		cb(null, false);
+	}
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({
+	storage: fileStorage,
+	fileFilter: fileFilter
+}).single('image')); // file picker named image
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/data/images', express.static(path.join(__dirname, 'data', 'images')));
 app.use(session({
 	secret: secret,
 	resave: false, // session won't be reset on every incoming request,

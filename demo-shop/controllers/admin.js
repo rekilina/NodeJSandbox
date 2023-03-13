@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const path = require('path');
 
 exports.getAddProduct = (req, res, next) => {
 	res.render('admin/add-product', {
@@ -7,27 +8,46 @@ exports.getAddProduct = (req, res, next) => {
 		formsCSS: true,
 		productCSS: true,
 		activeAddProduct: true,
-		isAuthenticated: req.session.isLoggedIn
+		isAuthenticated: req.session.isLoggedIn,
+		errorMessage: null
 	});
 };
 
 exports.postAddProduct = (req, res, next) => {
-	const product = new Product(
-		{
-			title: req.body.title,
-			price: req.body.price,
-			description: req.body.description,
-			imageUrl: req.body.imageUrl
-		});
-	product
-		.save() // method provided by mongoose
-		.then(() => {
-			res.status(200);
-			res.redirect('/admin/add-product');
-		})
-		.catch(err => {
-			console.log('admin postAddProduct failed');
-		});
+	const image = req.file;
+	if (!image) {
+		console.log('image: ', image);
+		return res.status(422).render('admin/add-product',
+			{
+				pageTitle: 'Add Product',
+				path: '/admin/add-product',
+				formsCSS: true,
+				productCSS: true,
+				activeAddProduct: true,
+				isAuthenticated: req.session.isLoggedIn,
+				errorMessage: 'Image upload error'
+			})
+	} else {
+		const imageUrl = image.path;
+		const product = new Product(
+			{
+				title: req.body.title,
+				price: req.body.price,
+				description: req.body.description,
+				imageUrl: imageUrl
+			});
+
+		product
+			.save() // method provided by mongoose
+			.then(() => {
+				res.status(200);
+				res.redirect('/admin/add-product');
+			})
+			.catch(err => {
+				console.log('admin postAddProduct failed');
+				console.log(err);
+			});
+	}
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -48,12 +68,7 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
 
-	const updates = {
-		title: req.body.title,
-		description: req.body.description,
-		price: req.body.price,
-		imgUrl: req.body.imgUrl
-	};
+	const image = req.file;
 	const prodId = req.body._id;
 
 	Product.findById(prodId)
@@ -61,7 +76,9 @@ exports.postEditProduct = (req, res, next) => {
 			product.title = req.body.title;
 			product.description = req.body.description;
 			product.price = req.body.price;
-			product.imageUrl = req.body.imageUrl;
+			if (image) {
+				product.imageUrl = path.join(...image.path.split('\\'));
+			}
 			return product.save();
 		})
 		.then(result => {
@@ -71,6 +88,7 @@ exports.postEditProduct = (req, res, next) => {
 			res.status(500).json({ error: 'update failed: ' + err });
 			console.log('update failed', err);
 		})
+
 }
 
 exports.postDeleteProduct = (req, res, next) => {
