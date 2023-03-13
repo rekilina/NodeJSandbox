@@ -8,6 +8,8 @@
             <main>
                 <% for (let order of orders) { %>
                     <h1>Total Price: <%= order.totalPrice.toFixed(2) %> $</h1>
+                    <h2>Email: <%= userEmail %>
+                    </h2>
                     <% if (order.items.length> 0) { %>
                         <div class="grid">
                             <% for (let product of order.items) { %>
@@ -42,10 +44,14 @@
                                     </div>
                                 </article>
                                 <% } %>
+                                    <div class="centered">
+                                        <a href="/orders/<%= order._id %>" class="btn">Download Invoice</a>
+                                    </div>
                         </div>
                         <% } else { %>
                             <h1>No Products Found!</h1>
                             <% } %>
                                 <% } %>
+
             </main>
             <%- include('../includes/end.ejs') %>

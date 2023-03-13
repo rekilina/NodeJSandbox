@@ -1,6 +1,10 @@
 const Product = require('../models/product');
-const User = require('../models/user');
 const Order = require('../models/order');
+const { ObjectId } = require('mongodb');
+const fs = require('fs');
+const path = require('path');
+
+const rootDir = path.dirname(require.main.filename);
 
 exports.getIndex = (req, res, next) => {
 	Product.find()
@@ -104,22 +108,16 @@ exports.deleteFromCart = (req, res, next) => {
 
 }
 
-// exports.getCheckout = (req, res, next) => {
-//   res.render('shop/sheckout', {
-//     pageTitle: 'Checkout',
-//     path: '/checkout'
-//   });
-// }
-
-
 exports.getOrders = (req, res, next) => {
-	Order.find()
+	const userEmail = req.session.user.email;
+	Order.find({ userId: new ObjectId(req.session.user._id) })
 		.then(orders => {
 			res.render('shop/orders', {
 				pageTitle: 'Orders',
 				path: '/orders',
 				orders: orders,
-				isAuthenticated: req.session.isLoggedIn
+				isAuthenticated: req.session.isLoggedIn,
+				userEmail: req.session.user.email
 			});
 		})
 
@@ -132,4 +130,49 @@ exports.postOrder = (req, res, next) => {
 			req.user.clearCart();
 			res.redirect('/cart');
 		});
+}
+
+exports.getInvoice = (req, res, next) => {
+	const orderId = req.params.orderId;
+	const invoiceName = 'invoice_' + String(orderId) + '.txt';
+	const invoicePath = path.join(rootDir, 'data', invoiceName);
+
+	Order.findById(new ObjectId(orderId))
+		.then(order => {
+			const invoice = {
+				id: order._id,
+				totalPrice: order.totalPrice,
+				items: order.items.map(item => {
+					return {
+						title: item.title,
+						price: item.price
+					}
+				})
+			}
+			fs.writeFileSync(invoicePath,
+				JSON.stringify(invoice),
+				err => {
+					console.log('failed writing file: ', err);
+				});
+			// return order;
+		})
+		.catch(err => {
+			console.log('find order by id failed: ', err);
+			return next(err);
+		})
+		.then(() => {
+			// ok so i've created file now I want to download it 
+			// IF it was created successfully
+			fs.readFile(invoicePath, (err, data) => {
+				if (err) {
+					console.log('We have an error and we are in then block', err);
+					return next(err);
+				}
+				res.header('Content-Type', 'text/plain');
+				// this header is necessary
+				res.header('Content-Disposition', 'attachment');
+				res.send(data);
+			});
+		})
+
 }
