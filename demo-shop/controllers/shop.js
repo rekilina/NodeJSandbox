@@ -6,7 +6,8 @@ const path = require('path');
 const e = require('connect-flash');
 const PDFDocument = require('pdfkit');
 const ejs = require('ejs');
-const pdf = require("pdf-creator-node");
+// const pdf = require("pdf-creator-node");
+let pdf = require("html-pdf");
 
 const rootDir = path.dirname(require.main.filename);
 
@@ -156,30 +157,14 @@ exports.getInvoice = (req, res, next) => {
 			}
 		})
 		.then(order => {
-			const invoice = {
-				id: order._id,
-				totalPrice: order.totalPrice,
-				items: order.items.map(item => {
-					return {
-						title: item.title,
-						price: item.price
-					}
-				})
-			}
-			// fs.writeFileSync(invoicePath,
-			// 	JSON.stringify(invoice),
-			// 	err => {
-			// 		console.log('failed writing file: ', err);
-			// 	});
-
 			res.header('Content-Type', 'application/pdf');
 			res.header('Content-Disposition', 'attachment; filename="' + invoiceName + '"');
+
+			// ---------- using PDFKIT ----------------
 
 			const invoiceDoc = new PDFDocument();
 			invoiceDoc.pipe(fs.createWriteStream(invoicePath));
 			invoiceDoc.pipe(res);
-			// invoiceDoc.text(invoice);
-
 			invoiceDoc.fontSize(26).text('Invoice', {
 				underlined: true
 			});
@@ -188,8 +173,32 @@ exports.getInvoice = (req, res, next) => {
 				invoiceDoc.text(item.title + ' x ' + item.quantity + ' x ' + item.price);
 			})
 			invoiceDoc.text('Total: ' + order.totalPrice);
-
 			invoiceDoc.end();
+
+			// ---------------------------------------
+
+			// ----------- USING HTML-PDF ------------------
+
+			// ejs.renderFile(path.join(rootDir, 'views', "email", 'invoice.ejs'),
+			// 	{ order: order }, (err, data) => {
+			// 		if (err) {
+			// 			res.send(err);
+			// 		} else {
+			// 			pdf.create(data, {}).toFile(invoicePath, (err, data) => {
+			// 				if (err) {
+			// 					res.send(err);
+			// 				} else {
+			// 					res.send("File created successfully");
+			// 					return resolve(invoiceName);
+			// 				}
+			// 			});
+			// 		}
+			// 	});
+			// -----------------------------------------
+
+
+			// -------- try html-pdf-node package
+
 		})
 		.then((err) => {
 			// ok so i've created file now I want to download it 
