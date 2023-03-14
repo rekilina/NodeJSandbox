@@ -106,8 +106,10 @@ exports.postEditProduct = (req, res, next) => {
 
 }
 
-exports.postDeleteProduct = (req, res, next) => {
-	const prodId = req.body._id;
+// exports.postDeleteProduct = (req, res, next) => {
+exports.deleteProduct = (req, res, next) => {
+	// const prodId = req.body._id;
+	const prodId = req.params.prodId;
 	Product.findById(new ObjectId(prodId)).then(product => {
 		if (!product) {
 			return next(new Error('Product not found'));
@@ -116,12 +118,19 @@ exports.postDeleteProduct = (req, res, next) => {
 		return Product.findByIdAndRemove(prodId)
 	})
 		.then(result => {
-			res.status(200).redirect("/admin/products");
-			return result;
+			// res.status(200).redirect("/admin/products");
+			// return result;
+			res.status(200).json({ message: "Success!" });
 		})
 		.catch(err => {
-			res.status(500).json({ error: 'delete failed: ' + err });
-			console.log('update failed', err);
+			// res.status(500).json({ error: 'delete failed: ' + err });
+			// console.log('update failed', err);
+
+			// const error = new Error(err);
+			// error.httpStatus = 500;
+			// return next(error);
+
+			res.status(500).json({ message: "Deleting product failed" });
 		})
 }
 
