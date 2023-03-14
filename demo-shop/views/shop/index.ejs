@@ -33,7 +33,7 @@
                     </div>
                     <section class="pagination">
                         <% for (let i=0; i < pagesNum; i++) { %>
-                            <a href="/?page=<%= i+1 %>" class="<% (path === '/?page=' + (i+1)) ? 'active' : '' %>">
+                            <a href="/?page=<%= i+1 %>" class="<%= page === String(i+1) ? 'active' : '' %>">
                                 <%= i+1 %>
                             </a>
                             <% } %>

@@ -214,6 +214,7 @@ form {
   border: 1px solid transparent;
   color: #00695c;
   text-decoration: none;
+  text-align: center;
 }
 
 .pagination a.active {

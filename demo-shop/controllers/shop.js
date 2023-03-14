@@ -29,7 +29,8 @@ exports.getIndex = (req, res, next) => {
 			res.render('shop/index', {
 				prods: products,
 				pageTitle: 'Shop',
-				path: '/?page=' + page,
+				page: page,
+				path: '/',
 				hasProducts: products.length > 0,
 				activeShop: true,
 				productCSS: true,
