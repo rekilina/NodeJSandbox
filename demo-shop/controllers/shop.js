@@ -10,19 +10,31 @@ const ejs = require('ejs');
 let pdf = require("html-pdf");
 
 const rootDir = path.dirname(require.main.filename);
+const ITEMS_PER_PAGE = 2;
+let totalItems;
 
 exports.getIndex = (req, res, next) => {
-	Product.find()
+	const page = req.query.page ? req.query.page : 1;
+
+	Product.find().countDocuments()
+		.then(numProducts => {
+			totalItems = numProducts;
+			return Product.find()
+				.skip((page - 1) * ITEMS_PER_PAGE)
+				.limit(ITEMS_PER_PAGE)
+		})
 		.then(products => {
 			res.status(200);
+
 			res.render('shop/index', {
 				prods: products,
 				pageTitle: 'Shop',
-				path: '/',
+				path: '/?page=' + page,
 				hasProducts: products.length > 0,
 				activeShop: true,
 				productCSS: true,
-				isAuthenticated: req.session.isLoggedIn
+				isAuthenticated: req.session.isLoggedIn,
+				pagesNum: Math.ceil(totalItems / ITEMS_PER_PAGE)
 			});
 		})
 		.catch((err) => {
