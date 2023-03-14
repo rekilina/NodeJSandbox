@@ -32,24 +32,35 @@ exports.postAddProduct = (req, res, next) => {
 			})
 	} else {
 		const imageUrl = image.path;
-		const product = new Product(
-			{
-				title: req.body.title,
-				price: req.body.price,
-				description: req.body.description,
-				imageUrl: imageUrl
-			});
+		try {
+			const product = new Product(
+				{
+					_id: ObjectId('640081a2faa354f19d0528bc'),
+					title: req.body.title,
+					price: req.body.price,
+					description: req.body.description,
+					imageUrl: imageUrl
+				});
 
-		product
-			.save() // method provided by mongoose
-			.then(() => {
-				res.status(200);
-				res.redirect('/admin/add-product');
-			})
-			.catch(err => {
-				console.log('admin postAddProduct failed');
-				console.log(err);
-			});
+			product
+				.save() // method provided by mongoose
+				.then(() => {
+					res.status(200);
+					res.redirect('/admin/add-product');
+				})
+				.catch(err => {
+					// console.log('admin postAddProduct failed');
+					// console.log(err);
+					const error = new Error('Creating of product failed');
+					error.httpStatusCode = 500;
+					return next(error);
+				});
+		} catch {
+			const error = new Error('Creating of product object failed');
+			error.httpStatusCode = 500;
+			return next(error);
+		}
+
 	}
 };
 
