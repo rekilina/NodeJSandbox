@@ -41,10 +41,14 @@
                                 </div>
                             </article>
                             <% } %>
-                                <form method="POST" action="/post-order">
+                                <!-- <form method="POST" action="/post-order">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <button type="submit" class="btn">Post Order</button>
-                                </form>
+                                </form> -->
+
+                    </div>
+                    <div class="centered">
+                        <a href="/checkout" class="btn">Order now</a>
                     </div>
                     <% } else { %>
                         <h1>No Products Found!</h1>

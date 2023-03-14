@@ -2,7 +2,31 @@
 	</head>
 
 	<body>
-		<%- include('includes/navigation.ejs') %>
+		<%- include('../includes/navigation.ejs') %>
 			<h1>Checkout</h1>
+			<% if (hasProducts) { %>
+				<table border="1px" cellpadding="7x">
+					<tr>
+						<th>Product title</th>
+						<th>Price</th>
+						<th>Quantity</th>
+					</tr>
+					<% for (product of products) { %>
+						<tr>
+							<td>
+								<%= product.title %>
+							</td>
+							<td>
+								<%= product.price %>
+							</td>
+							<td>
+								<%= product.quantity %>
+							</td>
+						</tr>
+						<% } %>
+				</table>
+				<% } %>
+					<h3>Total price: <%= totalPrice %> $</h3>
 
-			<%- include('includes/end.ejs') %>
+					<button type="button" class="btn">Checkout</button>
+					<%- include('../includes/end.ejs') %>

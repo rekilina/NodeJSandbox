@@ -239,3 +239,29 @@ exports.getInvoice = (req, res, next) => {
 			// return next();
 		})
 }
+
+exports.getCheckout = (req, res, next) => {
+	const cart = req.user.cart;
+	req.user.populate('cart.items._id').then(user => {
+		const cartItemsArray = user.cart.items;
+		const zipProducts = cartItemsArray.map(elem => {
+			return {
+				...elem._id._doc,
+				quantity: elem.quantity
+			}
+		});
+		const totalPrice = zipProducts.reduce((acc, curr) => {
+			return acc + Number(curr.quantity) * Number(curr.price);
+		}, 0);
+		res.render('shop/checkout', {
+			products: zipProducts,
+			pageTitle: 'Checkout',
+			path: '/checkout',
+			hasProducts: zipProducts.length > 0,
+			activeShop: true,
+			productCSS: true,
+			totalPrice: totalPrice,
+			isAuthenticated: req.session.isLoggedIn
+		});
+	})
+}
