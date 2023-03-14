@@ -88,7 +88,6 @@ userSchema.methods.addOrder = function () {
 		.then(user => {
 			const cartItemsArray = user.cart.items;
 			const zipProducts = cartItemsArray.map(elem => {
-				console.log(elem._id);
 				return {
 					...elem._id._doc,
 					quantity: elem.quantity
