@@ -202,3 +202,24 @@ form {
     display: none;
   }
 }
+
+.pagination {
+  margin: 20px auto;
+  font-size: 26px;
+  text-align: center;
+}
+
+.pagination a {
+  padding: 5px;
+  border: 1px solid transparent;
+  color: #00695c;
+  text-decoration: none;
+}
+
+.pagination a.active {
+  border: 1px solid #00695c;  
+}
+
+.pagination a:hover {
+  text-decoration: underline;
+}

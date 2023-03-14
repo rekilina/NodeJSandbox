@@ -35,7 +35,7 @@ exports.postAddProduct = (req, res, next) => {
 		try {
 			const product = new Product(
 				{
-					_id: ObjectId('640081a2faa354f19d0528bc'),
+					// _id: ObjectId('640081a2faa354f19d0528bc'),
 					title: req.body.title,
 					price: req.body.price,
 					description: req.body.description,
