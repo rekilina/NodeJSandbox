@@ -8,6 +8,8 @@ const PDFDocument = require('pdfkit');
 const ejs = require('ejs');
 // const pdf = require("pdf-creator-node");
 let pdf = require("html-pdf");
+const { stripe_secret } = require('../util/credentials');
+const stripe = require('stripe')(stripe_secret);
 
 const rootDir = path.dirname(require.main.filename);
 const ITEMS_PER_PAGE = 2;
@@ -146,7 +148,7 @@ exports.postOrder = (req, res, next) => {
 	req.user.addOrder()
 		.then(result => {
 			req.user.clearCart();
-			res.redirect('/cart');
+			res.redirect('/orders');
 		});
 }
 
@@ -241,27 +243,67 @@ exports.getInvoice = (req, res, next) => {
 }
 
 exports.getCheckout = (req, res, next) => {
+	// ------ here we should prepare Stripe session ---------
 	const cart = req.user.cart;
+	let products;
+	let totalPrice = 0;
 	req.user.populate('cart.items._id').then(user => {
 		const cartItemsArray = user.cart.items;
-		const zipProducts = cartItemsArray.map(elem => {
+		products = cartItemsArray.map(elem => {
 			return {
 				...elem._id._doc,
 				quantity: elem.quantity
 			}
 		});
-		const totalPrice = zipProducts.reduce((acc, curr) => {
+		totalPrice = products.reduce((acc, curr) => {
 			return acc + Number(curr.quantity) * Number(curr.price);
 		}, 0);
-		res.render('shop/checkout', {
-			products: zipProducts,
-			pageTitle: 'Checkout',
-			path: '/checkout',
-			hasProducts: zipProducts.length > 0,
-			activeShop: true,
-			productCSS: true,
-			totalPrice: totalPrice,
-			isAuthenticated: req.session.isLoggedIn
+
+		return stripe.checkout.sessions.create({
+			payment_method_types: ['card'],
+			line_items: products.map(p => {
+				return {
+					price_data: {
+						currency: 'usd',
+						product_data: {
+							name: p.title,
+						},
+						unit_amount: Number(p.price * 100).toFixed(0),
+					},
+					quantity: p.quantity,
+				};
+			}),
+			mode: 'payment',
+			success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+			cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel'
 		});
+
 	})
+		.then((session) => {
+			res.render('shop/checkout', {
+				products: products,
+				pageTitle: 'Checkout',
+				path: '/checkout',
+				hasProducts: products.length > 0,
+				activeShop: true,
+				productCSS: true,
+				totalPrice: totalPrice,
+				isAuthenticated: req.session.isLoggedIn,
+				sessionId: session.id
+			});
+		})
+}
+
+exports.getCheckoutSuccess = (req, res, next) => {
+	res.render('shop/checkout-success', {
+		pageTitle: 'Checkout',
+		path: '/checkout/success'
+	});
+}
+
+exports.getCheckoutCancel = (req, res, next) => {
+	res.render('shop/checkout-cancel', {
+		pageTitle: 'Checkout',
+		path: '/checkout/success'
+	});
 }
