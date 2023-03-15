@@ -8,6 +8,11 @@ router.get('/posts', feedController.getPosts);
 
 router.get('/posts/:postId', feedController.getPost);
 
+router.put('/posts/:postId', [
+	body('title').trim().isLength({ min: 5 }).notEmpty(),
+	body('content').trim().isLength({ min: 5 }).notEmpty()
+], feedController.updatePost);
+
 router.post('/post', [
 	body('title').trim().isLength({ min: 5 }).notEmpty(),
 	body('content').trim().isLength({ min: 5 }).notEmpty()

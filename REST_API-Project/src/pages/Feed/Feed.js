@@ -59,7 +59,12 @@ class Feed extends Component {
       })
       .then(resData => {
         this.setState({
-          posts: resData.posts,
+          posts: resData.posts.map(post => {
+            return {
+              ...post,
+              imagePath: post.imageUrl
+            }
+          }),
           totalPosts: resData.totalItems,
           postsLoading: false
         });
@@ -115,18 +120,20 @@ class Feed extends Component {
       }
     });
     let url = 'http://localhost:8080/feed/post';
+    let method = 'POST';
     if (this.state.editPost) {
-      url = 'URL_EDIT';
+      url = 'http://localhost:8080/feed/posts/' + this.state.editPost._id;
+      method = 'PUT';
     }
 
     fetch(url, {
-      method: 'POST',
+      method: method,
       body: formData
     })
       .then(res => {
         console.log(res);
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Creating or editing a post failed!');
+          throw new Error('Creating or editing a post failed! ' + res.status);
         }
         return res.json();
       })
