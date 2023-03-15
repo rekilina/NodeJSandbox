@@ -69,7 +69,6 @@ exports.createPost = (req, res, next) => {
 	});
 	post.save()
 		.then(createdPost => {
-			console.log(createdPost);
 			res.status(201).json({
 				message: "Post created successfully",
 				post: createdPost
@@ -135,6 +134,34 @@ exports.updatePost = (req, res, next) => {
 		});
 
 };
+
+exports.deletePost = (req, res, next) => {
+	const postId = req.params.postId;
+
+	Post.findById(postId)
+		.then(post => {
+			// check whether the creatpr is currently logged in user
+			if (!post) {
+				const error = new Error('Post not found / feed controller error');
+				error.statusCode = 404;
+				throw error;
+			}
+			clearImage(post.imageUrl);
+			return Post.findByIdAndRemove(postId);
+		})
+		.then(result => {
+			res.status(200).json({
+				message: "Post deleted - success"
+			});
+		})
+		.catch(err => {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		});
+}
 
 const clearImage = filePath => {
 	filePath = path.join(path.dirname(require.main.filename), filePath);
