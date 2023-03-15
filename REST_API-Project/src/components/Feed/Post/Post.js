@@ -13,8 +13,8 @@ const post = props => (
     </header>
     {/* <div className="post__image">
       <Image imageUrl={props.image} contain />
-    </div>
-    <div className="post__content">{props.content}</div> */}
+    </div>*/
+      <div className="post__content">{props.content}</div>}
     <div className="post__actions">
       <Button mode="flat" link={props.id}>
         View
