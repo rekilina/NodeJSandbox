@@ -17,10 +17,9 @@ exports.createPost = (req, res, next) => {
 	// create it in the db
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
-		return res.status(422).json({
-			message: "Validation failed on createPost route.",
-			errors: errors
-		});
+		const error = new Error("Validation failed on createPost route.");
+		error.statusCode = 422;
+		throw error;
 	}
 
 	const title = req.body.title;
@@ -42,6 +41,9 @@ exports.createPost = (req, res, next) => {
 			});
 		})
 		.catch(err => {
-			console.log('Error while saving Post to DB in feed.js', err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		});
 }
