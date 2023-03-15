@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
+const { mongoPassword, mongoLogin, secret } = require('./util/credentials');
 const feedRoutes = require('./routes/feed');
+const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/testdb?retryWrites=true&w=majority`;
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes);
 
-mongoose.connect('mongodb+srv://ivshebarshina:g5e5BFUHcxVyhnVs@cluster0.jt3fsu1.mongodb.net/SocialMediaProject')
+mongoose.connect(MONGODB_URI)
 	.then(result => {
 		app.listen(8080);
 	})
