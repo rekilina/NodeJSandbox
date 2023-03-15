@@ -83,6 +83,7 @@ class Signup extends Component {
             value={this.state.signupForm['email'].value}
             valid={this.state.signupForm['email'].valid}
             touched={this.state.signupForm['email'].touched}
+            name="email"
           />
           <Input
             id="name"
@@ -94,6 +95,7 @@ class Signup extends Component {
             value={this.state.signupForm['name'].value}
             valid={this.state.signupForm['name'].valid}
             touched={this.state.signupForm['name'].touched}
+            name="name"
           />
           <Input
             id="password"
@@ -105,6 +107,7 @@ class Signup extends Component {
             value={this.state.signupForm['password'].value}
             valid={this.state.signupForm['password'].valid}
             touched={this.state.signupForm['password'].touched}
+            name="password"
           />
           <Button design="raised" type="submit" loading={this.props.loading}>
             Signup
