@@ -6,6 +6,8 @@ const feedController = require('../controllers/feed');
 
 router.get('/posts', feedController.getPosts);
 
+router.get('/posts/:postId', feedController.getPost);
+
 router.post('/post', [
 	body('title').trim().isLength({ min: 5 }).notEmpty(),
 	body('content').trim().isLength({ min: 5 }).notEmpty()
