@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const Post = require('../models/posts');
 const { ObjectId } = require('mongodb');
+const path = require('path');
 
 exports.getPosts = (req, res, next) => {
 	Post.find()
@@ -48,7 +49,13 @@ exports.createPost = (req, res, next) => {
 		error.statusCode = 422;
 		throw error;
 	}
-
+	if (!req.file) {
+		const error = "Image was not uploaded";
+		error.statusCode = 422;
+		throw error;
+	}
+	// const imageUrl = path.join(...req.file.path.split('\\'));
+	const imageUrl = req.file.path.replace('\\', '/');
 	const title = req.body.title;
 	const content = req.body.content;
 	const post = new Post({
@@ -57,7 +64,7 @@ exports.createPost = (req, res, next) => {
 			name: "Author Name"
 		},
 		content: content,
-		imageUrl: "images/cat.webp"
+		imageUrl: imageUrl
 	});
 	post.save()
 		.then(createdPost => {
