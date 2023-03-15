@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { mongoPassword, mongoLogin, secret } = require('./util/credentials');
 const feedRoutes = require('./routes/feed');
-const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/testdb?retryWrites=true&w=majority`;
+const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/SocialMediaProject?retryWrites=true&w=majority`;
 
 const app = express();
 

@@ -1,18 +1,16 @@
 const { validationResult } = require('express-validator');
+const Post = require('../models/posts')
 
 exports.getPosts = (req, res, next) => {
-	res.status(200).json({
-		posts: [{
-			_id: '1',
-			title: "post title",
-			creator: {
-				name: "Author Name"
-			},
-			createdAt: new Date().toString(),
-			image: "images/jelly.jpg",
-			content: "this is post"
-		}]
-	});
+	Post.find()
+		.then(posts => {
+			res.status(200).json({
+				posts: posts
+			});
+		})
+		.catch(err => {
+			console.log('Failed fetch all posts in feed.js getPosts', err);
+		})
 }
 
 exports.createPost = (req, res, next) => {
@@ -24,19 +22,26 @@ exports.createPost = (req, res, next) => {
 			errors: errors
 		});
 	}
+
 	const title = req.body.title;
 	const content = req.body.content;
-
-	res.status(201).json({
-		message: "Post created successfully",
-		post: {
-			_id: new Date().toString(),
-			title: title,
-			content: content,
-			creator: {
-				name: "Author Name"
-			},
-			createdAt: new Date().toString()
-		}
-	})
+	const post = new Post({
+		title: title,
+		creator: {
+			name: "Author Name"
+		},
+		content: content,
+		imageUrl: "images/cat.webp"
+	});
+	post.save()
+		.then(createdPost => {
+			console.log(createdPost);
+			res.status(201).json({
+				message: "Post created successfully",
+				post: createdPost
+			});
+		})
+		.catch(err => {
+			console.log('Error while saving Post to DB in feed.js', err);
+		});
 }
