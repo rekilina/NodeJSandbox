@@ -6,7 +6,7 @@ const path = require('path');
 const multer = require('multer');
 
 const feedRoutes = require('./routes/feed');
-
+const authRoutes = require('./routes/auth');
 
 const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/SocialMediaProject?retryWrites=true&w=majority`;
 
@@ -51,6 +51,7 @@ app.use(multer({
 }).single('image'));
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 // error handling middleware
 app.use((error, req, res, next) => {
