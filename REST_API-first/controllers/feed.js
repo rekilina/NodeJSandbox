@@ -108,7 +108,6 @@ exports.updatePost = (req, res, next) => {
 	Post.findById(postId)
 		.then(post => {
 			if (!post) {
-				console.log("Post not found, ", post);
 				const error = new Error('Post not found / feed controller error');
 				error.statusCode = 404;
 				throw error;
