@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const feedRoutes = require('./routes/feed');
 
@@ -16,4 +17,14 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes);
 
-app.listen(8080);
+mongoose.connect('mongodb+srv://ivshebarshina:g5e5BFUHcxVyhnVs@cluster0.jt3fsu1.mongodb.net/SocialMediaProject')
+	.then(result => {
+		app.listen(8080);
+	})
+	.catch(err => {
+		// how can i pass this err to frontend
+		// to display error message there? 
+		// msg, that DB connection is broken?
+		console.log(err);
+	});
+
