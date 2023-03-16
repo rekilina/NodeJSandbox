@@ -14,7 +14,7 @@ router.put('/posts/:postId', isAuth, [
 	body('content').trim().isLength({ min: 5 }).notEmpty()
 ], feedController.updatePost);
 
-router.post('/post', [
+router.post('/post', isAuth, [
 	body('title').trim().isLength({ min: 5 }).notEmpty(),
 	body('content').trim().isLength({ min: 5 }).notEmpty()
 ], feedController.createPost);

@@ -3,6 +3,7 @@ const Post = require('../models/posts');
 const { ObjectId } = require('mongodb');
 const path = require('path');
 const fs = require('fs');
+const User = require('../models/user');
 
 exports.getPosts = (req, res, next) => {
 	const currentPage = req.query.page || 1;
@@ -12,7 +13,7 @@ exports.getPosts = (req, res, next) => {
 		.then(count => {
 			totalItems = count;
 			return Post
-				.find()
+				.find().populate('creator')
 				.skip((currentPage - 1) * perPage)
 				.limit(2);
 		})
@@ -70,19 +71,40 @@ exports.createPost = (req, res, next) => {
 	const imageUrl = req.file.path.replace('\\', '/');
 	const title = req.body.title;
 	const content = req.body.content;
+	let creator;
+	console.log(req.userId);
 	const post = new Post({
 		title: title,
-		creator: {
-			name: "Author Name"
-		},
+		creator: req.userId,
 		content: content,
 		imageUrl: imageUrl
 	});
+
 	post.save()
 		.then(createdPost => {
+			return User.findById(req.userId);
+		})
+		.then(user => {
+			creator = user;
+			// mongoose will extract the user id and do the rest
+			user.posts.push(post);
+			return user.save();
+		})
+		.then(result => {
 			res.status(201).json({
 				message: "Post created successfully",
-				post: createdPost
+				// post: post,   
+				// creator: {
+				// 	_id: creator._id,
+				// 	name: creator.name
+				// }
+				post: {
+					...post,
+					creator: {
+						_id: creator._id,
+						name: creator.name
+					}
+				}
 			});
 		})
 		.catch(err => {

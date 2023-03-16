@@ -63,6 +63,7 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        console.log(resData);
         this.setState({
           posts: resData.posts.map(post => {
             return {
@@ -119,11 +120,7 @@ class Feed extends Component {
     formData.append('title', postData.title);
     formData.append('content', postData.content);
     formData.append('image', postData.image);
-    formData.append('image', {
-      creator: {
-        name: "Author Name"
-      }
-    });
+    formData.append('creator', postData.creator);
     let url = 'http://localhost:8080/feed/post';
     let method = 'POST';
     if (this.state.editPost) {
