@@ -63,7 +63,18 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
 	.then(result => {
-		app.listen(8080);
+		const server = app.listen(8080);
+		// set up socket.io connection
+		const io = require('socket.io')(server, {
+			cors: {
+				origins: "*"
+			}
+		});
+		// connection between server and clients
+		io.on('connection', socket => {
+			// will be executed every time a new client connects
+			console.log('New client connected!');
+		});
 	})
 	.catch(err => {
 		// how can i pass this err to frontend
