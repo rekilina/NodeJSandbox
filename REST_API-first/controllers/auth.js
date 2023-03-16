@@ -113,7 +113,6 @@ exports.updateUserStatus = (req, res, next) => {
 			return user.save();
 		})
 		.then(user => {
-			console.log(user);
 			res.status(200).json({
 				status: user.status
 			});
