@@ -5,31 +5,29 @@ const path = require('path');
 const fs = require('fs');
 const User = require('../models/user');
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
 	const currentPage = req.query.page || 1;
 	const perPage = 2;
 	let totalItems;
-	Post.find().countDocuments()
-		.then(count => {
-			totalItems = count;
-			return Post
-				.find().populate('creator')
-				.skip((currentPage - 1) * perPage)
-				.limit(2);
-		})
-		.then(posts => {
-			res.status(200).json({
-				posts: posts,
-				totalItems: totalItems
-			});
-		})
-		.catch(err => {
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			console.log('Failed fetch all posts in feed.js getPosts', err);
-			next(err);
-		})
+	try {
+		const count = await Post.find().countDocuments()
+		totalItems = count;
+		const posts = await Post
+			.find().populate('creator')
+			.skip((currentPage - 1) * perPage)
+			.limit(2);
+
+		res.status(200).json({
+			posts: posts,
+			totalItems: totalItems
+		});
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		console.log('Failed fetch all posts in feed.js getPosts', err);
+		next(err);
+	}
 }
 
 exports.getPost = (req, res, next) => {
