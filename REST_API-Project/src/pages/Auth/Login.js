@@ -79,6 +79,7 @@ class Login extends Component {
             label="Your E-Mail"
             type="email"
             control="input"
+            name="email"
             onChange={this.inputChangeHandler}
             onBlur={this.inputBlurHandler.bind(this, 'email')}
             value={this.state.loginForm['email'].value}
@@ -90,6 +91,7 @@ class Login extends Component {
             label="Password"
             type="password"
             control="input"
+            name="password"
             onChange={this.inputChangeHandler}
             onBlur={this.inputBlurHandler.bind(this, 'password')}
             value={this.state.loginForm['password'].value}

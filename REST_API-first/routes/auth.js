@@ -20,4 +20,6 @@ router.put('/signup', [
 	body('password').isStrongPassword()
 ], authController.signup);
 
+router.post('/login', authController.login);
+
 module.exports = router;
