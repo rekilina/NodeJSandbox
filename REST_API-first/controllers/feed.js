@@ -72,7 +72,6 @@ exports.createPost = (req, res, next) => {
 	const title = req.body.title;
 	const content = req.body.content;
 	let creator;
-	console.log(req.userId);
 	const post = new Post({
 		title: title,
 		creator: req.userId,
@@ -143,6 +142,11 @@ exports.updatePost = (req, res, next) => {
 				error.statusCode = 404;
 				throw error;
 			}
+			if (post.creator.toString() !== req.userId.toString()) {
+				const error = new Error("Not Authorized");
+				error.statusCode = 403;
+				throw error;
+			}
 			if (imageUrl !== post.imageUrl) {
 				clearImage(post.imageUrl);
 			}
@@ -176,6 +180,11 @@ exports.deletePost = (req, res, next) => {
 			if (!post) {
 				const error = new Error('Post not found / feed controller error');
 				error.statusCode = 404;
+				throw error;
+			}
+			if (post.creator.toString() !== req.userId.toString()) {
+				const error = new Error("Not Authorized");
+				error.statusCode = 403;
 				throw error;
 			}
 			clearImage(post.imageUrl);
