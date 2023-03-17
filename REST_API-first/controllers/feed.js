@@ -4,10 +4,11 @@ const { ObjectId } = require('mongodb');
 const path = require('path');
 const fs = require('fs');
 const User = require('../models/user');
+const io = require('../socket');
 
 exports.getPosts = async (req, res, next) => {
 	const currentPage = req.query.page || 1;
-	const perPage = 2;
+	const perPage = 20;
 	let totalItems;
 	try {
 		const count = await Post.find().countDocuments()
@@ -15,7 +16,7 @@ exports.getPosts = async (req, res, next) => {
 		const posts = await Post
 			.find().populate('creator')
 			.skip((currentPage - 1) * perPage)
-			.limit(2);
+			.limit(perPage);
 
 		res.status(200).json({
 			posts: posts,
@@ -88,13 +89,18 @@ exports.createPost = (req, res, next) => {
 			return user.save();
 		})
 		.then(result => {
+			io.getIO().emit('posts', {
+				action: 'create',
+				post: {
+					...post,
+					creator: {
+						_id: creator._id,
+						name: creator.name
+					},
+				}
+			});
 			res.status(201).json({
 				message: "Post created successfully",
-				// post: post,   
-				// creator: {
-				// 	_id: creator._id,
-				// 	name: creator.name
-				// }
 				post: {
 					...post,
 					creator: {

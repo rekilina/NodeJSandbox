@@ -41,7 +41,29 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
-    openSocket('http://localhost:8080');
+    const socket = openSocket('http://localhost:8080');
+    socket.on('posts', data => {
+      if (data.action === 'create') {
+        this.addPost(data.post);
+      }
+    });
+  }
+
+  addPost = (post) => {
+    this.setState(prevState => {
+      const updatedPosts = [...prevState.posts];
+      if (prevState.postPage === 1) {
+        if (prevState.posts.length >= 2) {
+          updatedPosts.pop();
+        }
+        updatedPosts.unshift(post);
+      }
+      return {
+        posts: updatedPosts,
+        totalPosts: prevState.totalPosts + 1
+      };
+    });
+
   }
 
   loadPosts = direction => {
@@ -135,14 +157,14 @@ class Feed extends Component {
     formData.append('title', postData.title);
     formData.append('content', postData.content);
     formData.append('image', postData.image);
-    formData.append('creator', postData.creator);
     let url = 'http://localhost:8080/feed/post';
     let method = 'POST';
     if (this.state.editPost) {
       url = 'http://localhost:8080/feed/posts/' + this.state.editPost._id;
       method = 'PUT';
     }
-
+    console.log('postData: ', postData);
+    console.log('formData: ', formData);
     fetch(url, {
       method: method,
       body: formData,
@@ -158,13 +180,13 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
+        console.log('resData: ', resData.post._doc.title);
         const post = {
-          _id: resData.post._id,
-          title: resData.post.title,
-          content: resData.post.content,
+          _id: resData.post._doc._id,
+          title: resData.post._doc.title,
+          content: resData.post._doc.content,
           creator: resData.post.creator,
-          createdAt: resData.post.createdAt
+          createdAt: resData.post._doc.createdAt
         };
         this.setState(prevState => {
           let updatedPosts = [...prevState.posts];
@@ -173,9 +195,10 @@ class Feed extends Component {
               p => p._id === prevState.editPost._id
             );
             updatedPosts[postIndex] = post;
-          } else if (prevState.posts.length < 2) {
-            updatedPosts = prevState.posts.concat(post);
           }
+          // else if (prevState.posts.length < 20) {
+          //   updatedPosts = prevState.posts.concat(post);
+          // }
           return {
             posts: updatedPosts,
             isEditing: false,
@@ -277,7 +300,7 @@ class Feed extends Component {
             <Paginator
               onPrevious={this.loadPosts.bind(this, 'previous')}
               onNext={this.loadPosts.bind(this, 'next')}
-              lastPage={Math.ceil(this.state.totalPosts / 2)}
+              lastPage={Math.ceil(this.state.totalPosts / 20)}
               currentPage={this.state.postPage}
             >
               {this.state.posts.map(post => (
