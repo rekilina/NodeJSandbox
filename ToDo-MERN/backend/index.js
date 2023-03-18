@@ -20,6 +20,16 @@ app.use(cors());
 app.use(morgan('tiny'));
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.set('view engine', 'html');
+
+// error handling middleware
+app.use((error, req, res, next) => {
+	console.log(error);
+	const status = error.statusCode || 500;
+	const message = error.message;
+	res.status(status).json({ message: message })
+});
 
 // routes
 app.use('/auth', authRoutes);
@@ -36,7 +46,7 @@ app.use((req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
 	.then(result => {
-		const server = app.listen(8080);
+		const server = app.listen(port);
 	})
 	.catch(err => {
 		console.log(err);
