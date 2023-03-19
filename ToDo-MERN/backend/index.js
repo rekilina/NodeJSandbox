@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const userRoutes = require('./routes/users');
+const { isAuth } = require('./middleware/isAuth');
 
 const MONGODB_URI = `mongodb+srv://${mongoLogin}:${mongoPassword}@cluster0.jt3fsu1.mongodb.net/todo_list_db?retryWrites=true&w=majority`;
 const port = 8080;
@@ -33,8 +34,22 @@ app.use((error, req, res, next) => {
 
 // routes
 app.use('/auth', authRoutes);
-app.use('/tasks', taskRoutes);
-app.use('/tasks', userRoutes);
+app.use('/tasks', isAuth, taskRoutes);
+app.use('/users', isAuth, userRoutes);
+
+// error handler
+app.use((err, req, res, next) => {
+	if (!err.statusCode) {
+		err.statusCode = 500;
+	}
+	if (!err.message) {
+		err.message = "Undefined server error";
+	}
+	return res.status(Number(err.statusCode)).json({
+		messsage: err.message,
+		statusCode: err.statusCode
+	});
+});
 
 app.use((req, res, next) => {
 	res.setHeader('Access-Control-Allow-Origin', '*');
