@@ -24,7 +24,7 @@ exports.register = async (req, res, next) => {
 			password: hashedPassword
 		});
 		const response = await user.save();
-		res.json(response);
+		res.status(201).json(response);
 	} catch (err) {
 		console.log('register error: ', err)
 	}
