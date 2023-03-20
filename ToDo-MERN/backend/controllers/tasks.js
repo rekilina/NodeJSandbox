@@ -65,3 +65,34 @@ exports.createTask = async (req, res, next) => {
 		return next(err);
 	}
 }
+
+exports.updateTask = async (req, res, next) => {
+	try {
+		const userId = req.user.id;
+		if (!userId) {
+			throw errorHandler({
+				message: "Not Authorized",
+				statusCode: 401
+			});
+		}
+
+		const taskId = req.param.taskId;
+		const taskName = req.body.name;
+		const taskComplete = req.body.complete;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			throw errorHandler({
+				message: "Task not found",
+				statusCode: 404
+			});
+		}
+		task.name = taskName;
+		task.complete = taskComplete;
+		const response = await task.save();
+
+		return res.status(200).json(response);
+	} catch (err) {
+		return next(err);
+	}
+}
