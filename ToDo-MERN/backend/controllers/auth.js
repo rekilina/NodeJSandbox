@@ -38,7 +38,7 @@ exports.register = async (req, res, next) => {
 		const response = await user.save();
 		return res.status(201).json(response);
 	} catch (err) {
-		next(err);
+		return next(err);
 	}
 }
 
@@ -85,16 +85,41 @@ exports.login = async (req, res, next) => {
 			httpOnly: true // you can't access cookie on frontend
 		}).status(200).json({ message: "login success" });
 	} catch (err) {
-		next(err);
+		return next(err);
 	}
 }
 
-exports.logout = (req, res, next) => {
-
+exports.logout = async (req, res, next) => {
+	// clear cookie
+	const result = await res.clearCookie('access_token');
+	return res.status(200).json({ message: "Logout success" });
 }
 
-exports.getRegister = (req, res, next) => {
-	res.json({
-		"message": "hello world"
-	});
+exports.isLoggedIn = async (req, res, next) => {
+	// check our token
+	// every time we send the request from our frontend
+	// we will go to this route and check token
+	// (at this thime I have no idea how we will use it 
+	// as the frontend)
+	const token = req.cookie.access_token;
+	try {
+		if (!token) {
+			throw errorHandler({
+				message: "No token available in isLoggedIn function",
+				statusCode: 401
+			});
+		}
+		return jwt.verify(token, secret, (err) => {
+			if (err) {
+				// throw errorHandler({
+				// 	message: "Token verification failed in isLoggedIn()",
+				// 	statusCode: 401
+				// });
+				return res.json(false);
+			}
+			return res.json(true);
+		})
+	} catch (err) {
+		return next(err);
+	}
 }
