@@ -87,11 +87,51 @@ exports.updateTask = async (req, res, next) => {
 				statusCode: 404
 			});
 		}
+		if (task.user.toString !== userId.toString()) {
+			throw errorHandler({
+				message: "Not Authorized to update this task",
+				statusCode: 401
+			});
+		}
 		task.name = taskName;
 		task.complete = taskComplete;
 		const response = await task.save();
 
 		return res.status(200).json(response);
+	} catch (err) {
+		return next(err);
+	}
+}
+
+exports.deleteTask = async (req, res, next) => {
+	try {
+		const userId = req.user.id;
+		if (!userId) {
+			throw errorHandler({
+				message: "Not Authorized",
+				statusCode: 401
+			});
+		}
+
+		const taskId = req.params.taskId;
+		const task = await Task.findById(taskId).exec();
+		if (!task) {
+			throw errorHandler({
+				message: "Task not found",
+				statusCode: 404
+			});
+		}
+		if (task.user.toString !== userId.toString()) {
+			throw errorHandler({
+				message: "Not Authorized to update this task",
+				statusCode: 401
+			});
+		}
+
+		await Task.findByIdAndDelete(taskId);
+		return res.status(200).json({
+			message: "Task delete successfully"
+		});
 	} catch (err) {
 		return next(err);
 	}
