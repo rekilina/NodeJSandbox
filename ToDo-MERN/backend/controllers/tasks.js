@@ -121,7 +121,7 @@ exports.deleteTask = async (req, res, next) => {
 				statusCode: 404
 			});
 		}
-		if (task.user.toString !== userId.toString()) {
+		if (task.user.toString() !== userId.toString()) {
 			throw errorHandler({
 				message: "Not Authorized to update this task",
 				statusCode: 401

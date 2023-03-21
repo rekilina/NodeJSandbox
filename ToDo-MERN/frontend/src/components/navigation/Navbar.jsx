@@ -18,7 +18,6 @@ function Navbar() {
 	const getUser = async () => {
 		try {
 			const { data } = await axios.get('/api/users/me');
-			console.log('user data: ', data);
 			setUser(data);
 		} catch (err) {
 			console.log('getUser error: ', err);
