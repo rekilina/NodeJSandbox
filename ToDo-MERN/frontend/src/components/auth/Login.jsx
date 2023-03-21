@@ -16,8 +16,8 @@ function Login() {
 		console.log(user);
 		try {
 			await axios.post('/api/auth/login', user);
-			toast.success('Login success');
 			navigate('/');
+			toast.success('Login success');
 		} catch (err) {
 			console.log('login function: ', err);
 			toast.error('Login failed');
