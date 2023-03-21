@@ -7,8 +7,7 @@ export default () => {
 	const verifyAuth = async () => {
 		try {
 			const res = await axios.get('/api/auth/is_logged_in');
-			console.log(res.data);
-			return res;
+			return res.data;
 		} catch (err) {
 			console.log('useAuth err: ', err);
 			return false;
@@ -18,10 +17,11 @@ export default () => {
 	useEffect(() => {
 		const fetchAuthData = async () => {
 			const isAuth = await verifyAuth();
+			console.log('useAuth hook running: ', isAuth);
 			setAuth(isAuth);
 		}
 		fetchAuthData();
-	});
+	}, []);
 
-	return { auth };
+	return auth;
 }
