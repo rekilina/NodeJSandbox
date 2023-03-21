@@ -28,7 +28,8 @@ function TaskList() {
 		try {
 			const { data } = await axios.delete('api/tasks/delete/' + taskId.toString());
 			toast.success('Task delete success.');
-			fetchTasks();
+			// fetchTasks();
+			setTaskList(taskList.filter(task => task._id != taskId));
 		} catch (err) {
 			console.log('Task delete failed: ', err);
 			toast.error('Task delete failed.');
