@@ -101,7 +101,7 @@ exports.isLoggedIn = async (req, res, next) => {
 	// we will go to this route and check token
 	// (at this thime I have no idea how we will use it 
 	// as the frontend)
-	const token = req.cookie.access_token;
+	const token = req.cookies.access_token;
 	try {
 		if (!token) {
 			throw errorHandler({
@@ -109,7 +109,7 @@ exports.isLoggedIn = async (req, res, next) => {
 				statusCode: 401
 			});
 		}
-		return jwt.verify(token, secret, (err) => {
+		return jwt.verify(token, jwtsecret, (err) => {
 			if (err) {
 				// throw errorHandler({
 				// 	message: "Token verification failed in isLoggedIn()",
