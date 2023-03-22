@@ -7,8 +7,8 @@ import { FaUserAlt } from 'react-icons/fa';
 
 function Navbar() {
 	const iniState = {
-		name: "User name not fetched",
-		email: "test@test.com"
+		name: "",
+		email: ""
 	}
 
 	const [user, setUser] = useState(iniState);

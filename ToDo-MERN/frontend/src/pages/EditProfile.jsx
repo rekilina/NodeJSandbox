@@ -1,8 +1,12 @@
-
 import React from 'react'
+import EditProfileForm from '../components/profile/EditProfileForm'
 
-export default function EditProfile() {
+function EditProfile() {
   return (
-	<div>EditProfile</div>
+    <div>
+      <EditProfileForm />
+    </div>
   )
 }
+
+export default EditProfile

@@ -21,10 +21,11 @@ function TaskItem({ task, onDelete }) {
 				complete: !taskStatus()
 			});
 			setIsComplete(!taskStatus());
-			setIsLoading(false);
 		} catch (err) {
 			console.log('Update task failed: ', err);
 			toast.error('Update task failed.');
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
