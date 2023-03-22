@@ -6,12 +6,14 @@ import toast from 'react-hot-toast';
 
 function TaskList() {
 	const [taskList, setTaskList] = useState([]);
+	const [isAdding, setIsAdding] = useState(false);
+	const [newTask, setNewTask] = useState('');
 
 	const fetchTasks = async () => {
 		try {
 			const response = await axios.get('/api/tasks');
 			const tasks = response.data.sort((a, b) => {
-				new Date(b.createdAt) > new Date(a.createdAt)
+				return new Date(b.createdAt) > new Date(a.createdAt)
 			});
 			// console.log('tasks: ', tasks);
 			setTaskList(tasks);
@@ -36,11 +38,48 @@ function TaskList() {
 		}
 	}
 
+	const newTaskInputHandler = (e) => {
+		setNewTask(e.target.value);
+	}
+
+	const isAddingHandler = (e) => {
+		const currStatus = () => { return isAdding };
+		setIsAdding(!currStatus());
+	}
+
+	const addNewTask = async (e) => {
+		e.preventDefault();
+		const task = {
+			name: newTask
+		}
+		try {
+			const { data } = await axios.post('api/tasks/new/', task);
+			toast.success('New task successfully added.');
+			fetchTasks();
+			setNewTask('');
+			setIsAdding(false);
+		} catch (err) {
+			console.log('New task failed: ', err);
+			toast.error('New task failed.');
+		}
+	}
+
 	return (
 		<div>
 			<div className={classes.topBar}>
-				<button type="button" className={classes.addNew}>Add new</button>
+				<button type="button"
+					className={classes.addNew}
+					onClick={isAddingHandler}
+				>Add new</button>
 			</div>
+			{isAdding && (
+				<form className={classes.addNewForm}
+					onSubmit={addNewTask}>
+					<input type="text" value={newTask} onChange={newTaskInputHandler} />
+					<button type="submits"
+						className={classes.addNew}>Add</button>
+				</form>
+			)}
 			<table className={classes.taskList_table}>
 				<tbody>
 					{
