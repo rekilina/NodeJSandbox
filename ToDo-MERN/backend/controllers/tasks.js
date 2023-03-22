@@ -76,7 +76,7 @@ exports.updateTask = async (req, res, next) => {
 			});
 		}
 
-		const taskId = req.param.taskId;
+		const taskId = req.params.taskId;
 		const taskName = req.body.name;
 		const taskComplete = req.body.complete;
 
@@ -87,7 +87,7 @@ exports.updateTask = async (req, res, next) => {
 				statusCode: 404
 			});
 		}
-		if (task.user.toString !== userId.toString()) {
+		if (task.user.toString() !== userId.toString()) {
 			throw errorHandler({
 				message: "Not Authorized to update this task",
 				statusCode: 401
